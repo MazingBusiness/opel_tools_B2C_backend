@@ -1,62 +1,32 @@
-# Local reference only — do not commit
+# Local B2B reference — do not commit
 B2B/
 
-# OS
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-
-# Environment and secrets
-.env
-.env.*
-!.env.example
-
-# Dependencies
-vendor/
-node_modules/
-bower_components/
-composer.phar
-
-# Laravel / PHP
-bootstrap/cache/*.php
-storage/framework/cache/*
-storage/framework/sessions/*
-storage/framework/views/*
-storage/logs/*
-storage/*.key
 *.log
-error_log
-phpunit.xml
+.DS_Store
+.env
+.env.backup
+.env.production
+.phpactor.json
 .phpunit.result.cache
-.phpunit.cache/
-
-# IDE / editor
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
-.project
-.settings/
-*.sublime-project
-*.sublime-workspace
-
-# Build / cache
-*.cache
-.sass-cache/
-.npm/
-.yarn/
-.next/
-dist/
-build/
-
-# Misc
-*.bak
-*.tmp
-*.temp
-.htpasswd
+/.codex
+/.cursor/
+/.idea
+/.nova
+/.phpunit.cache
+/.vscode
+/.zed
+/auth.json
+/node_modules
+/public/build
+/public/fonts-manifest.dev.json
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+/vendor
+/database/*.sqlite
+/database/*.sqlite-journal
+_ide_helper.php
+Homestead.json
+Homestead.yaml
+Thumbs.db
