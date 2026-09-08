@@ -1,6 +1,6 @@
-# Mazing B2C backend
+# OPEL B2C backend
 
-Laravel shop API for the Mazing B2C React store. Own database. Payments on this app; fulfilment on B2B.
+Laravel shop API for the OPEL B2C React store. Own database. Payments on this app; fulfilment on B2B.
 
 Plan: [docs/b2c-backend-plan.md](docs/b2c-backend-plan.md)  
 B2B scan map: [docs/b2b-reference-map.md](docs/b2b-reference-map.md)

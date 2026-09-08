@@ -1,6 +1,8 @@
-# Mazing B2C backend
+# OPEL B2C backend
 
-Canonical product/tech plan: [docs/b2c-backend-plan.md](docs/b2c-backend-plan.md). Prefer that file over the PDF.
+Canonical product/tech plan: [docs/b2c-backend-plan.md](docs/b2c-backend-plan.md). Prefer that file over any PDF.
+
+Brand is **OPEL**. Use that name only in APIs, env, docs, and copy.
 
 B2B code: read only via [docs/b2b-reference-map.md](docs/b2b-reference-map.md). `B2B/` is gitignored local Laravel 8 reference — do not commit or fork.
 

@@ -1,9 +1,9 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "mazing/b2c-backend",
+    "name": "opel/b2c-backend",
     "type": "project",
-    "description": "Mazing B2C shop API (Laravel). Fulfilment stays on B2B.",
-    "keywords": ["laravel", "mazing", "b2c"],
+    "description": "OPEL B2C shop API (Laravel). Fulfilment stays on B2B.",
+    "keywords": ["laravel", "opel", "b2c"],
     "license": "MIT",
     "require": {
         "php": "^8.3",

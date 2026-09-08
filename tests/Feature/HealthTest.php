@@ -12,7 +12,7 @@ class HealthTest extends TestCase
             ->assertOk()
             ->assertJson([
                 'ok' => true,
-                'service' => 'mazing-b2c',
+                'service' => 'opel-b2c',
             ]);
     }
 }

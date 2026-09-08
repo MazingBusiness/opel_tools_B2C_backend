@@ -1,15 +1,17 @@
 # B2C backend plan (canonical for Cursor)
 
-**Prefer this file over `Mazing-B2C-Backend-Plan.pdf`.** Do not re-read the PDF unless this file is missing a fact.
+**Prefer this file over any PDF copy of the plan.** Do not re-read a PDF unless this file is missing a fact.
+
+**Brand is OPEL.** Use that name only in APIs, env, docs, and copy.
 
 B2B code: read **only** via [b2b-reference-map.md](b2b-reference-map.md). `B2B/` is gitignored local Laravel 8 reference — do not commit, do not fork.
 
 | Meta | Value |
 |------|--------|
-| Product | Mazing Business — B2C shop API |
+| Product | OPEL — B2C shop API |
 | Audience | Engineering, product, operations |
 | Scope | New B2C backend — own server and MySQL |
-| Related | Existing B2B Laravel (Mazing Business) |
+| Related | Existing B2B Laravel (OPEL B2B / fulfilment) |
 | Frontend | Existing React B2C shop (API-only; no React hours in this plan) |
 | Status | Draft plan for implementation |
 | v1 estimate | ~415 hours likely (~10–11 weeks, one backend); ceiling ~510 |
@@ -18,6 +20,7 @@ B2B code: read **only** via [b2b-reference-map.md](b2b-reference-map.md). `B2B/`
 
 ## Agent rules (scan these first)
 
+- Brand is **OPEL**. Use that name only in this codebase and in API payloads.
 - Greenfield Laravel **11 or 12**. Not Laravel 8. Not a B2B fork. Not Active eCommerce CMS.
 - React talks **only** to B2C. Two databases. **Never** write B2B tables from B2C.
 - B2C **sells and takes payment**. Fulfilment stays on B2B.
@@ -177,7 +180,7 @@ Keep rules simple in v1 (earn % + redeem cap). Complex tiers/expiry campaigns = 
 
 Shoppers are **not** B2B dealers. No GST signup on B2C.
 
-**Handoff customer (ops TBD):** new B2B user per shopper **or** one “Mazing Store B2C” account plus shipping snapshot on the order.
+**Handoff customer (ops TBD):** new B2B user per shopper **or** one “OPEL Store B2C” account plus shipping snapshot on the order.
 
 ---
 
@@ -277,7 +280,7 @@ Module table sums ~**441** (mid-range). Use 415 to plan; 510 if ingest under-est
 
 ## 13. Risks to settle before build (TBD)
 
-1. **Handoff customer:** new B2B user per shopper vs one B2C dummy customer (“Mazing Store B2C” + shipping snapshot).
+1. **Handoff customer:** new B2B user per shopper vs one B2C dummy customer (“OPEL Store B2C” + shipping snapshot).
 2. **Price:** B2B MRP vs B2C sell price (overrides).
 3. **Warehouse:** which DC B2C sells from (one DC vs nearest). v1 assumes one warehouse.
 4. **Oversell:** sync window vs oversell if stock is not reserved at checkout.
