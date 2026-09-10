@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
@@ -11,7 +10,5 @@ Route::prefix('v1')->group(function (): void {
         ]);
     });
 
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    })->middleware('auth:sanctum');
+    require app_path('Modules/Auth/routes.php');
 });

@@ -26,6 +26,7 @@ B2B/
 /vendor
 /database/*.sqlite
 /database/*.sqlite-journal
+/storage/app/firebase-credentials.json
 _ide_helper.php
 Homestead.json
 Homestead.yaml

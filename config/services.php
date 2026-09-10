@@ -35,4 +35,15 @@ return [
         ],
     ],
 
+    'smsalert' => [
+        'api_key' => env('SMSALERT_API_KEY'),
+        'sender' => env('SMSALERT_SENDER'),
+        'otp_text' => env('SMSALERT_OTP_TEXT', 'Your OPEL login code is {code}. It expires in 5 minutes.'),
+    ],
+
+    'firebase' => [
+        'credentials' => env('FIREBASE_CREDENTIALS'),
+        'project_id' => env('FIREBASE_PROJECT_ID'),
+    ],
+
 ];
