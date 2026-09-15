@@ -214,16 +214,36 @@ class CatalogTest extends TestCase
     {
         $this->seed(CatalogSeeder::class);
 
-        $this->assertSame(4, CategoryGroup::query()->count());
-        $this->assertSame(10, Category::query()->count());
-        $this->assertSame(8, Brand::query()->count());
-        $this->assertGreaterThanOrEqual(40, Product::query()->count());
-        $this->assertGreaterThanOrEqual(45, ProductVariant::query()->count());
-        $this->assertTrue(ProductVariant::query()->where('current_stock', 0)->exists());
-        $this->assertTrue(Product::query()->has('variants', '>', 1)->exists());
+        $this->assertSame(1, CategoryGroup::query()->count());
+        $this->assertSame(1, Category::query()->count());
+        $this->assertSame('POWER TOOLS', CategoryGroup::query()->value('name'));
+        $this->assertSame('AIR BLOWER', Category::query()->value('name'));
+        $this->assertSame(45, Product::query()->count());
+        $this->assertSame(45, ProductVariant::query()->count());
+        $this->assertFalse(Product::query()->has('variants', '>', 1)->exists());
+
+        $opel = ProductVariant::query()->where('part_no', 'MZ11018')->first();
+        $this->assertNotNull($opel);
+        $this->assertEquals(1055, (float) $opel->unit_price);
+        $this->assertEquals(1055, (float) $opel->mrp);
+        $this->assertEquals(372, $opel->current_stock);
+        $this->assertStringContainsString(
+            'mazingbusiness.com/public/uploads/all/thumb_/',
+            (string) $opel->product->thumbnail_img,
+        );
+
+        $withoutImage = Product::query()->where('slug', 'axtrim-pro--blue-series--electric-blower---axpt-322')->first();
+        $this->assertNotNull($withoutImage);
+        $this->assertNull($withoutImage->thumbnail_img);
+        $this->assertNull($withoutImage->photos);
+        $this->assertSame('MZ14890', $withoutImage->defaultVariant->part_no);
+
+        $amber = ProductVariant::query()->where('part_no', 'MZ07868')->first();
+        $this->assertSame(113, $amber->current_stock);
+        $this->assertSame(1, $amber->warehouses()->count());
 
         $this->getJson('/api/v1/products?per_page=50')
             ->assertOk()
-            ->assertJsonPath('meta.total', Product::query()->count());
+            ->assertJsonPath('meta.total', 45);
     }
 }

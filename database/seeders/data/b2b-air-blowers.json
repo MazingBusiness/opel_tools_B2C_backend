@@ -1,0 +1,1470 @@
+[
+  {
+    "part_no": "MZ11018",
+    "name": "OPEL 5332 - ELECTRIC BLOWER 600WATTS",
+    "slug": "opel-5332---electric-blower-600watt",
+    "mrp": "1055",
+    "images": [
+      {
+        "id": 79033,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/QwPwtyQTnktudjifIZdAc5uDkj2QJpuEaarPBT6K.png"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 2,
+        "warehouse_name": "Delhi",
+        "qty": 12
+      },
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 348
+      },
+      {
+        "warehouse_id": 1,
+        "warehouse_name": "Kolkata",
+        "qty": 12
+      }
+    ],
+    "thumb_img": {
+      "id": 79037,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/QwPwtyQTnktudjifIZdAc5uDkj2QJpuEaarPBT6K.png"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ14874",
+    "name": "OPEL EB550 - 550W ELECTRIC BLOWER",
+    "slug": "opel-eb550---550w-electric-blower",
+    "mrp": "1161",
+    "images": [
+      {
+        "id": 27935,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/jbOsbkPQjbbSJQvS3vL4uvyOSCqvYX3RESi7eZzs.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 1,
+        "warehouse_name": "Kolkata",
+        "qty": 12
+      },
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 283
+      }
+    ],
+    "thumb_img": {
+      "id": 27938,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/jbOsbkPQjbbSJQvS3vL4uvyOSCqvYX3RESi7eZzs.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ03022",
+    "name": "AUTO POWER BLOWER NORMAL",
+    "slug": "auto-power-blower-normal",
+    "mrp": "600",
+    "images": [
+      {
+        "id": 9262,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/oaz5P23OcD4roc7u0vIV6P6M0USzGTCn6q44PqTS.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 1
+      }
+    ],
+    "thumb_img": {
+      "id": 9283,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/oaz5P23OcD4roc7u0vIV6P6M0USzGTCn6q44PqTS.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ19553",
+    "name": "EAGLE BLOWER - EG-40 (6 MONTH WARRANTY)",
+    "slug": "eagle-blower---eg-40--6-month-warranty-",
+    "mrp": "835.16",
+    "images": [
+      {
+        "id": 38164,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/hC2tGL4LK5vPyQOC3b216FqQlOrQ9K5PDHLoRhOv.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 120
+      }
+    ],
+    "thumb_img": {
+      "id": 38166,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/hC2tGL4LK5vPyQOC3b216FqQlOrQ9K5PDHLoRhOv.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ07868",
+    "name": "AMBER AIR BLOWER 550W 2.MTR CORD AM-88 (6 MONTH WARRANTY)",
+    "slug": "amber-air-blower-550w-2-mtr-cord-am-88--6-month-warranty-",
+    "mrp": "994",
+    "images": [
+      {
+        "id": 70813,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/7Z7z7BrF9TQNHFfzHBu9UFqoNGw86lbJM23YFpgk.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 101
+      },
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 12
+      }
+    ],
+    "thumb_img": {
+      "id": 70815,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/7Z7z7BrF9TQNHFfzHBu9UFqoNGw86lbJM23YFpgk.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ00261",
+    "name": "Mastech Electric Blowers Mtebc40",
+    "slug": "mastech-electric-blowers-mtebc40",
+    "mrp": "1027",
+    "images": [
+      {
+        "id": 952,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/Cg6Vbzqe3EYHWEIcYJB2E0nRXaoEtdYlPdx8TnnB.jpg"
+      },
+      {
+        "id": 6472,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/Zijtmn6XKLh32wXK0SS2LK3L0miUl402Q79B1q09.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 2,
+        "warehouse_name": "Delhi",
+        "qty": 3
+      },
+      {
+        "warehouse_id": 2,
+        "warehouse_name": "Delhi",
+        "qty": 6
+      }
+    ],
+    "thumb_img": {
+      "id": 955,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/Cg6Vbzqe3EYHWEIcYJB2E0nRXaoEtdYlPdx8TnnB.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ14106",
+    "name": "MAF Blower 550W (2.8m3/Min) - MPEBC40",
+    "slug": "maf-blower-550w--2-8m3-min----mpebc40",
+    "mrp": "1302",
+    "images": [
+      {
+        "id": 65373,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/KrsWEhWAZBYybcm9c1VEsjUyrgfj1f8ZDwWIJAcY.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 77
+      }
+    ],
+    "thumb_img": {
+      "id": 65391,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/KrsWEhWAZBYybcm9c1VEsjUyrgfj1f8ZDwWIJAcY.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ26975",
+    "name": "KP TECH AIR BLOWER BK-AB7001 750W",
+    "slug": "kp-tech-air-blower-bk-ab7001-750w",
+    "mrp": "1351.25",
+    "images": [
+      {
+        "id": 52791,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/t5k7eSZjyZ90Ywc7bsRtcR7YX6V9VNmwR3OckSxw.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 74
+      }
+    ],
+    "thumb_img": {
+      "id": 52801,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/t5k7eSZjyZ90Ywc7bsRtcR7YX6V9VNmwR3OckSxw.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ07785",
+    "name": "TCA AIR BLOWER BL600A [8PC]",
+    "slug": "tca-air-blower-bl600a-[8pc]",
+    "mrp": "1495",
+    "images": [
+      {
+        "id": 50621,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/Ax2Eaux2BbL6vIHY46qVAPU4xnBqcy3q6ji6tMuU.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 12
+      }
+    ],
+    "thumb_img": {
+      "id": 50624,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/Ax2Eaux2BbL6vIHY46qVAPU4xnBqcy3q6ji6tMuU.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ13440",
+    "name": "Deli Aspirator Blower 500W - DL-GF03-E1",
+    "slug": "deli-aspirator-blower-500w---dl-gf03-e1",
+    "mrp": "1508",
+    "images": [
+      {
+        "id": 29564,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/UMLSHiBGI5ln47rqdEcjJAA9rwYL9xhdP2EdDFrp.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 2
+      }
+    ],
+    "thumb_img": {
+      "id": 29565,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/UMLSHiBGI5ln47rqdEcjJAA9rwYL9xhdP2EdDFrp.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ21774",
+    "name": "GOLDEN BULLET BLOWER BPT 40 GREEN NW",
+    "slug": "golden-bullet-blower-bpt-40-green-nw",
+    "mrp": "1899.8",
+    "images": [
+      {
+        "id": 41076,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/bzoNX9m8Dmv6lqDJoQ9amjrS9DMPJ7K3NCPUbY9j.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 53
+      }
+    ],
+    "thumb_img": {
+      "id": 41094,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/bzoNX9m8Dmv6lqDJoQ9amjrS9DMPJ7K3NCPUbY9j.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ18661",
+    "name": "Xtra Power Air Blower 500W 13000Rpm Xpt440",
+    "slug": "xtra-power-air-blower-500w-13000rpm-xpt440",
+    "mrp": "2083.5",
+    "images": [
+      {
+        "id": 37636,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/yDvGgMYNvwmyUdaMFT4mEnxNU1FdlSuIfsyr2HXO.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 48
+      }
+    ],
+    "thumb_img": {
+      "id": 37644,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/yDvGgMYNvwmyUdaMFT4mEnxNU1FdlSuIfsyr2HXO.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ14104",
+    "name": "MAF Aspirator Blower 650W (3.5m3/M) - MPVB-60",
+    "slug": "maf-aspirator-blower-650w--3-5m3-m----mpvb-60",
+    "mrp": "2581",
+    "images": [
+      {
+        "id": 67527,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/RP0BEkae7o6x1401u4eyvwbxIO4ZaHbTdzLD4G3O.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 39
+      },
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 4
+      }
+    ],
+    "thumb_img": {
+      "id": 67528,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/RP0BEkae7o6x1401u4eyvwbxIO4ZaHbTdzLD4G3O.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ28765",
+    "name": "AKARI BLOWER (BLOWER CUM VACUUM) (4.5M3/MIN) (0-16000RPM) (4 PCS) - APT-VB-1180",
+    "slug": "akari-blower--blower-cum-vacuum---4-5m3-min---0-16000rpm---4-pcs----apt-vb-1180",
+    "mrp": "3495.4",
+    "images": [
+      {
+        "id": 56567,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/87GpMArqSdavQ2X1T6zsYPEAKbn40oeY2mHE1Ln6.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 2,
+        "warehouse_name": "Delhi",
+        "qty": 29
+      }
+    ],
+    "thumb_img": {
+      "id": 56576,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/87GpMArqSdavQ2X1T6zsYPEAKbn40oeY2mHE1Ln6.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ29626",
+    "name": "XTRA POWER XP-AM-811 PORTABLE AIR MOVER 150W",
+    "slug": "xtra-power-xp-am-811-portable-air-mover-150w",
+    "mrp": "4888.2",
+    "images": [
+      {
+        "id": 58134,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/Igjfsa90tunWs9n0JrB81UtoNuBQtyGWtwTVtEYJ.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 20
+      }
+    ],
+    "thumb_img": {
+      "id": 58142,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/Igjfsa90tunWs9n0JrB81UtoNuBQtyGWtwTVtEYJ.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ14890",
+    "name": "AXTRIM PRO (BLUE SERIES) ELECTRIC BLOWER - AXPT-322",
+    "slug": "axtrim-pro--blue-series--electric-blower---axpt-322",
+    "mrp": "629.44",
+    "images": [],
+    "stocks": [
+      {
+        "warehouse_id": 2,
+        "warehouse_name": "Delhi",
+        "qty": 159
+      }
+    ],
+    "thumb_img": null,
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    },
+    "thumbnail_img": "file:///data/user/0/com.ace.tools/cache/ImagePicker/33cdf5c8-9e9f-4381-bdaf-c0e04e13626e.jpeg",
+    "photos": null
+  },
+  {
+    "part_no": "MZ14891",
+    "name": "AXTRIM PRO (BLUE SERIES) MAGIC - BLOWER (VARIABLE SPEED) - MAGC-323",
+    "slug": "axtrim-pro--blue-series--magic---blower--variable-speed----magc-323",
+    "mrp": "833.88",
+    "images": [
+      {
+        "id": 50802,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/Zng57EnzKojXA2IMCdd0F1anbpELjs4WELkBO8YP.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 2,
+        "warehouse_name": "Delhi",
+        "qty": 120
+      }
+    ],
+    "thumb_img": {
+      "id": 50807,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/Zng57EnzKojXA2IMCdd0F1anbpELjs4WELkBO8YP.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ34337",
+    "name": "XLNT ELECTRIC BLOWER - P-EB20",
+    "slug": "xlnt-electric-blower---p-eb20",
+    "mrp": "859",
+    "images": [
+      {
+        "id": 69213,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/lscXo79sbhcIXuU6MRwiIfgEqKWQMLsePk3nZPqM.png"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 116
+      }
+    ],
+    "thumb_img": {
+      "id": 69216,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/lscXo79sbhcIXuU6MRwiIfgEqKWQMLsePk3nZPqM.png"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ39310",
+    "name": "BLACK STAR ELECTRIC BLOWER 28A - BS-28A",
+    "slug": "black-star-electric-blower-28a---bs-28a",
+    "mrp": "876.32",
+    "images": [
+      {
+        "id": 81738,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/VSLWPDl9LcRisv2Neaz97tv3NGh5TVOWVvNiYER3.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 2,
+        "warehouse_name": "Delhi",
+        "qty": 114
+      }
+    ],
+    "thumb_img": {
+      "id": 81739,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/VSLWPDl9LcRisv2Neaz97tv3NGh5TVOWVvNiYER3.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ18606",
+    "name": "Bhavani Electric Air Blower - Blower BI40",
+    "slug": "bhavani-electric-air-blower---blower-bi40",
+    "mrp": "911",
+    "images": [
+      {
+        "id": 36791,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/O4lULVopCUDBwOSnfbZCAlUmeco9TouD1ryNIPPG.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 110
+      }
+    ],
+    "thumb_img": {
+      "id": 36793,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/O4lULVopCUDBwOSnfbZCAlUmeco9TouD1ryNIPPG.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ19698",
+    "name": "POKER ELECTRIC AIR BLOWER 650W - PEB-40",
+    "slug": "poker-electric-air-blower-650w---peb-40",
+    "mrp": "993",
+    "images": [
+      {
+        "id": 39286,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/M9XEvByxoAJ7bYl8LSwdNCsSG3gfZDte8bHMppnT.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 101
+      }
+    ],
+    "thumb_img": {
+      "id": 39288,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/M9XEvByxoAJ7bYl8LSwdNCsSG3gfZDte8bHMppnT.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ39145",
+    "name": "TCA ELECTRIC BLOWER -EBC40 (12PC)",
+    "slug": "tca-electric-blower--ebc40--12pc-",
+    "mrp": "994.74",
+    "images": [
+      {
+        "id": 79613,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/fGwhFuyzAavbU3fzIqrDLyfa8o4jwQu30zn5ElM7.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 101
+      }
+    ],
+    "thumb_img": {
+      "id": 79614,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/fGwhFuyzAavbU3fzIqrDLyfa8o4jwQu30zn5ElM7.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ10222",
+    "name": "Akari Blower (2.5M3/Min) (0-13000Rpm) (8 Pcs) - Apt-Eb-28A",
+    "slug": "akari-blower--2-5m3-min---0-13000rpm---8-pcs----apt-eb-28a",
+    "mrp": "1025.32",
+    "images": [
+      {
+        "id": 19694,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/Q8TM1lLfRn7V69MPdv28jHjiyRJVNvnBu80XfAK4.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 2,
+        "warehouse_name": "Delhi",
+        "qty": 98
+      }
+    ],
+    "thumb_img": {
+      "id": 19707,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/Q8TM1lLfRn7V69MPdv28jHjiyRJVNvnBu80XfAK4.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ07869",
+    "name": "AMBER AIR BLOWER 550W 5.MTR CORD AM-88 (6 MONTH WARRANTY)",
+    "slug": "amber-air-blower-550w--5-mtr-cord-am-88--6-month-warranty-",
+    "mrp": "1060.6",
+    "images": [
+      {
+        "id": 70798,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/wok15ssZe7Ebvwe4HutsflfVEOKMQtW0Bt9dQ2oU.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 94
+      }
+    ],
+    "thumb_img": {
+      "id": 70799,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/wok15ssZe7Ebvwe4HutsflfVEOKMQtW0Bt9dQ2oU.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ23117",
+    "name": "JON BHANDARI ELECTRIC BLOWER E-006",
+    "slug": "jon-bhandari-electric-blower-e-006",
+    "mrp": "1082",
+    "images": [
+      {
+        "id": 43498,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/xHntrs75nDjCn2CFab9pmscUKNtO70BiJE6NFOlC.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 92
+      }
+    ],
+    "thumb_img": {
+      "id": 43505,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/xHntrs75nDjCn2CFab9pmscUKNtO70BiJE6NFOlC.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ19699",
+    "name": "CASTLE ELECTRIC AIR BLOWER 650W - HE-40",
+    "slug": "castle-electric-air-blower-650w---he-40",
+    "mrp": "1085",
+    "images": [
+      {
+        "id": 39287,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/5dSR8BmAPjhpnEoczKpvx6y3BNvVlSrYYSXAhp1m.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 92
+      }
+    ],
+    "thumb_img": {
+      "id": 39289,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/5dSR8BmAPjhpnEoczKpvx6y3BNvVlSrYYSXAhp1m.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ07870",
+    "name": "AMBER AIR BLOWER VARIABLE SPEED AMV-88 (6 MONTH WARRANTY)",
+    "slug": "amber-air-blower-variable-speed-amv-88--6-month-warranty-",
+    "mrp": "1101.59",
+    "images": [
+      {
+        "id": 18387,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/5083WyAixY7ggaZqUbJkF3bsRatVuaq3pQRxEC4T.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 91
+      }
+    ],
+    "thumb_img": {
+      "id": 18406,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/5083WyAixY7ggaZqUbJkF3bsRatVuaq3pQRxEC4T.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ19604",
+    "name": "AMBER ELECTRIC AIR BLOWER 550W WITH 2.MTR CORD - UNB-88 (6 MONTHS WARRANTY)",
+    "slug": "amber-electric-air-blower-550w-with-2-mtr-cord---unb-88--6-months-warranty-",
+    "mrp": "1111.84",
+    "images": [
+      {
+        "id": 38383,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/TOGKZzmMH8EGKJ8zw7qVlDhlJ54TdhwRS9AiSE87.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 90
+      }
+    ],
+    "thumb_img": {
+      "id": 38385,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/TOGKZzmMH8EGKJ8zw7qVlDhlJ54TdhwRS9AiSE87.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ14105",
+    "name": "MAF Blower 500W (2.5m3/Min) - MPEBC-50V",
+    "slug": "maf-blower-500w--2-5m3-min----mpebc-50v",
+    "mrp": "1120",
+    "images": [
+      {
+        "id": 29240,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/bN6xGe97L7Z9lvXR3gvTmehlVT2U5OwpV5Ptgzkt.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 89
+      }
+    ],
+    "thumb_img": {
+      "id": 29241,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/bN6xGe97L7Z9lvXR3gvTmehlVT2U5OwpV5Ptgzkt.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ38521",
+    "name": "JON BHANDARI ELECTRIC BLOWER (HEAVY DUTY) - P-080",
+    "slug": "jon-bhandari-electric-blower--heavy-duty----p-080",
+    "mrp": "1134.52",
+    "images": [
+      {
+        "id": 82766,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/JGIDKdBRd5bCRzdDvDyiGU1JW00HDmuuM7g12Bwr.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 88
+      }
+    ],
+    "thumb_img": {
+      "id": 82767,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/JGIDKdBRd5bCRzdDvDyiGU1JW00HDmuuM7g12Bwr.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ18607",
+    "name": "Everron Electric Air Blower - Blower ET40",
+    "slug": "everron-electric-air-blower---blower-et40",
+    "mrp": "1157",
+    "images": [
+      {
+        "id": 36792,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/eUH0szcGezihTQSeMJ2iNdVMWbXXjJETlyydFAZu.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 86
+      }
+    ],
+    "thumb_img": {
+      "id": 36794,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/eUH0szcGezihTQSeMJ2iNdVMWbXXjJETlyydFAZu.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ34753",
+    "name": "AMBER AIR BLOWER 550W 5.MTR CORD UNB-88 (6 MONTH WARRANTY)",
+    "slug": "amber-air-blower-550w-5-mtr-cord-unb-88--6-month-warranty-",
+    "mrp": "1178.45",
+    "images": [
+      {
+        "id": 70818,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/dICPxzzw1vhcwx4MUILusHOr6UyWjGAvDIXJBaui.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 85
+      }
+    ],
+    "thumb_img": {
+      "id": 70820,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/dICPxzzw1vhcwx4MUILusHOr6UyWjGAvDIXJBaui.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ34756",
+    "name": "AMBER AIR BLOWER 550W VARIABLE SPEED UNB-88 (6 MONTH WARRANTY)",
+    "slug": "amber-air-blower-550w-variable-speed-unb-88--6-month-warranty-",
+    "mrp": "1219.44",
+    "images": [
+      {
+        "id": 70822,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/AgZBeeGcZzXF768LidsR87oqOdqHMkg7DOQAQItG.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 82
+      }
+    ],
+    "thumb_img": {
+      "id": 70823,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/AgZBeeGcZzXF768LidsR87oqOdqHMkg7DOQAQItG.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ18148",
+    "name": "AKARI AIR BLOWER 600W 15000RPM APTEBEVS",
+    "slug": "akari-air-blower-600w-15000rpm-aptebevs",
+    "mrp": "1235.04",
+    "images": [
+      {
+        "id": 51435,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/gVpxPi6fFr5vuKRBvx0e6wvfFB75kmZNQFVLqmlH.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 2,
+        "warehouse_name": "Delhi",
+        "qty": 81
+      }
+    ],
+    "thumb_img": {
+      "id": 51438,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/gVpxPi6fFr5vuKRBvx0e6wvfFB75kmZNQFVLqmlH.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ32708",
+    "name": "MATRIX ELECTRIC BLOWER (YELLOW) - MPT-529",
+    "slug": "matrix-electric-blower--yellow----mpt-529",
+    "mrp": "1344.97",
+    "images": [
+      {
+        "id": 62286,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/yJfsNs6cD59IzjvzrTHDryJNeD1UJQc083WmrP3I.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 2,
+        "warehouse_name": "Delhi",
+        "qty": 74
+      }
+    ],
+    "thumb_img": {
+      "id": 62290,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/yJfsNs6cD59IzjvzrTHDryJNeD1UJQc083WmrP3I.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ15170",
+    "name": "MATRIX ELECTRIC BLOWER - MPT-528",
+    "slug": "matrix-electric-blower---mpt-528",
+    "mrp": "1397.69",
+    "images": [
+      {
+        "id": 52448,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/Cg1P3uuTGX9rHONhjOKKFf4PoM2x6cw0BSmhWrGK.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 2,
+        "warehouse_name": "Delhi",
+        "qty": 72
+      }
+    ],
+    "thumb_img": {
+      "id": 52458,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/Cg1P3uuTGX9rHONhjOKKFf4PoM2x6cw0BSmhWrGK.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ28999",
+    "name": "YOCA BLOWER MACHINE 60MM YC2360VS-G",
+    "slug": "yoca-blower-machine-60mm-yc2360vs-g",
+    "mrp": "1441",
+    "images": [
+      {
+        "id": 56984,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/psQwVKi6sTYmSdJXF2VnmYkbmL2gzObQi5ZcCI42.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 2,
+        "warehouse_name": "Delhi",
+        "qty": 69
+      }
+    ],
+    "thumb_img": {
+      "id": 56993,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/psQwVKi6sTYmSdJXF2VnmYkbmL2gzObQi5ZcCI42.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ17448",
+    "name": "Hi Max Air Blower 550W 13000Rpm Ic084",
+    "slug": "hi-max-air-blower-550w-13000rpm-ic084",
+    "mrp": "1456.56",
+    "images": [
+      {
+        "id": 32177,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/FIGsT7BBIy56FTAOvVMZcnZojEjlj7BUdGhLxyJI.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 2,
+        "warehouse_name": "Delhi",
+        "qty": 69
+      }
+    ],
+    "thumb_img": {
+      "id": 32193,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/FIGsT7BBIy56FTAOvVMZcnZojEjlj7BUdGhLxyJI.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ14714",
+    "name": "MAKUTE BLOWER 600W - PB007-V",
+    "slug": "makute-blower-600w---pb007-v",
+    "mrp": "1475",
+    "images": [
+      {
+        "id": 29504,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/OofsSv0x3UYIaBDMA6LFveFo9fEG7atBcMbO9qfh.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 68
+      }
+    ],
+    "thumb_img": {
+      "id": 29505,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/OofsSv0x3UYIaBDMA6LFveFo9fEG7atBcMbO9qfh.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ39776",
+    "name": "SILVER BULLET AIR BLOWER 600W - BLW 4240",
+    "slug": "silver-bullet-air-blower-600w---blw-4240",
+    "mrp": "1499.84",
+    "images": [
+      {
+        "id": 79866,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/WvC6cKKEX2UpDUP5CKSKNJsEHllMMDaEst72jXDr.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 67
+      }
+    ],
+    "thumb_img": {
+      "id": 79867,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/WvC6cKKEX2UpDUP5CKSKNJsEHllMMDaEst72jXDr.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ14107",
+    "name": "MAF Blower 650W (6.5m3/Min) - MPEB650",
+    "slug": "maf-blower-650w--6-5m3-min----mpeb650",
+    "mrp": "1563",
+    "images": [
+      {
+        "id": 78689,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/cQUjAmB18z8DDdVFBxS5lRcjzuyURAus1q7B8aJA.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 64
+      }
+    ],
+    "thumb_img": {
+      "id": 78690,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/cQUjAmB18z8DDdVFBxS5lRcjzuyURAus1q7B8aJA.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ28994",
+    "name": "FOREVER BLOWER MACHINE 60MM FT2360VS-G",
+    "slug": "forever-blower-machine-60mm-ft2360vs-g",
+    "mrp": "1649.28",
+    "images": [
+      {
+        "id": 61997,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/ncGpfZecZpmWTbfjwwocjITmDPym1OFKZmcujBuX.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 2,
+        "warehouse_name": "Delhi",
+        "qty": 61
+      }
+    ],
+    "thumb_img": {
+      "id": 61998,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/ncGpfZecZpmWTbfjwwocjITmDPym1OFKZmcujBuX.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ28995",
+    "name": "FOREVER GOLD BLOWER MACHINE (DUST PROOF) 60MM FG-EB-60-DB",
+    "slug": "forever-gold-blower-machine--dust-proof--60mm-fg-eb-60-db",
+    "mrp": "1649.28",
+    "images": [
+      {
+        "id": 56963,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/hG1FkEmdo3hPnpWfxu5FmUedgHsNob0MOBuwpVIl.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 2,
+        "warehouse_name": "Delhi",
+        "qty": 61
+      }
+    ],
+    "thumb_img": {
+      "id": 56969,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/hG1FkEmdo3hPnpWfxu5FmUedgHsNob0MOBuwpVIl.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ17449",
+    "name": "Hi Max Air Blower 600W 16000Rpm Ic037",
+    "slug": "hi-max-air-blower-600w-16000rpm-ic037",
+    "mrp": "1767.67",
+    "images": [
+      {
+        "id": 32165,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/brBKAYC0tbwHXSpnLO7z6QflCD27dhSv9E4ML3It.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 2,
+        "warehouse_name": "Delhi",
+        "qty": 57
+      }
+    ],
+    "thumb_img": {
+      "id": 32178,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/brBKAYC0tbwHXSpnLO7z6QflCD27dhSv9E4ML3It.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  },
+  {
+    "part_no": "MZ37558",
+    "name": "POWERMATIC BLOWER EBC40 TYPE 750W - PTC-EBC-40",
+    "slug": "powermatic-blower-ebc40-type-750w---ptc-ebc-40",
+    "mrp": "1774.98",
+    "images": [
+      {
+        "id": 75894,
+        "file_name": "https://mazingbusiness.com/public/uploads/all/7IdoOa3TzVX3H3xRXX6HFZSDe3ZWAgSVn8zSKGhr.jpg"
+      }
+    ],
+    "stocks": [
+      {
+        "warehouse_id": 6,
+        "warehouse_name": "Mumbai",
+        "qty": 56
+      }
+    ],
+    "thumb_img": {
+      "id": 75895,
+      "file_name": "https://mazingbusiness.com/public/uploads/all/thumb_/7IdoOa3TzVX3H3xRXX6HFZSDe3ZWAgSVn8zSKGhr.jpg"
+    },
+    "category_group": {
+      "id": 1,
+      "name": "POWER TOOLS"
+    },
+    "category": {
+      "id": 1,
+      "name": "AIR BLOWER",
+      "image": null
+    }
+  }
+]
