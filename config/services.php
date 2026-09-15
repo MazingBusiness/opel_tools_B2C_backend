@@ -38,7 +38,7 @@ return [
     'smsalert' => [
         'api_key' => env('SMSALERT_API_KEY'),
         'sender' => env('SMSALERT_SENDER'),
-        'otp_text' => env('SMSALERT_OTP_TEXT', 'Your OPEL login code is {code}. It expires in 5 minutes.'),
+        'otp_text' => env('SMSALERT_OTP_TEXT', 'Your OPEL login code is {code}. It expires in 2 minutes.'),
     ],
 
     'firebase' => [

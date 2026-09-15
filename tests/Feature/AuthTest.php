@@ -41,7 +41,7 @@ class AuthTest extends TestCase
             ->assertJson([
                 'ok' => true,
                 'channel' => 'email',
-                'expires_in' => 300,
+                'expires_in' => 120,
             ]);
 
         Notification::assertSentOnDemand(EmailOtpNotification::class);
@@ -57,7 +57,7 @@ class AuthTest extends TestCase
         config([
             'services.smsalert.api_key' => 'test-key',
             'services.smsalert.sender' => 'OPELXX',
-            'services.smsalert.otp_text' => 'Your OPEL login code is {code}. It expires in 5 minutes.',
+            'services.smsalert.otp_text' => 'Your OPEL login code is {code}. It expires in 2 minutes.',
         ]);
 
         Http::fake([
