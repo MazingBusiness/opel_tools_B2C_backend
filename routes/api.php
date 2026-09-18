@@ -12,4 +12,5 @@ Route::prefix('v1')->group(function (): void {
 
     require app_path('Modules/Auth/routes.php');
     require app_path('Modules/Catalog/routes.php');
+    require app_path('Modules/Wishlist/routes.php');
 });
