@@ -44,4 +44,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Modules\Wishlist\Models\WishlistItem::class);
     }
+
+    public function cartItems(): HasMany
+    {
+        return $this->hasMany(\App\Modules\Cart\Models\CartItem::class);
+    }
 }
