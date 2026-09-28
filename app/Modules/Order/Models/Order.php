@@ -26,6 +26,7 @@ class Order extends Model
         'shipping_fee',
         'grand_total',
         'currency',
+        'payment_method',
         'payment_status',
         'payment_link_id',
         'payment_link_url',

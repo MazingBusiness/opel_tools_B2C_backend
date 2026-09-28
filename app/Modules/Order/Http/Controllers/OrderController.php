@@ -65,8 +65,14 @@ class OrderController extends Controller
             ->whereKey((int) $request->validated('address_id'))
             ->firstOrFail();
 
+        $paymentMethod = (string) ($request->validated('payment_method') ?? 'zoho');
+        if (! in_array($paymentMethod, ['zoho', 'cod'], true)) {
+            $paymentMethod = 'zoho';
+        }
+        $isCod = $paymentMethod === 'cod';
+
         try {
-            $order = DB::transaction(function () use ($user, $address) {
+            $order = DB::transaction(function () use ($user, $address, $paymentMethod, $isCod) {
                 $cartItems = CartItem::query()
                     ->where('user_id', $user->id)
                     ->with(['product', 'variant'])
@@ -112,36 +118,75 @@ class OrderController extends Controller
                     : self::SHIPPING_FEE;
                 $grand = round($subtotal + $shipping, 2);
 
-                $order = Order::query()->create([
-                    'user_id' => $user->id,
-                    'number' => $this->nextOrderNumber(),
-                    'status' => 'pending_payment',
-                    'address_id' => $address->id,
-                    'shipping_name' => $address->name,
-                    'shipping_phone' => $address->phone,
-                    'shipping_line1' => $address->line1,
-                    'shipping_line2' => $address->line2,
-                    'shipping_city' => $address->city,
-                    'shipping_state' => $address->state,
-                    'shipping_pincode' => $address->pincode,
-                    'item_count' => $itemCount,
-                    'subtotal' => $subtotal,
-                    'shipping_fee' => $shipping,
-                    'grand_total' => $grand,
-                    'currency' => 'INR',
-                    'payment_status' => 'unpaid',
-                    'timeline' => OrderTimeline::initialPending(),
-                    'handoff_status' => null,
-                ]);
+                if ($isCod) {
+                    // COD: processing + unpaid; timeline matches paid-path shape (never applyPaid).
+                    $placedAt = now();
+                    $order = Order::query()->create([
+                        'user_id' => $user->id,
+                        'number' => $this->nextOrderNumber(),
+                        'status' => 'processing',
+                        'address_id' => $address->id,
+                        'shipping_name' => $address->name,
+                        'shipping_phone' => $address->phone,
+                        'shipping_line1' => $address->line1,
+                        'shipping_line2' => $address->line2,
+                        'shipping_city' => $address->city,
+                        'shipping_state' => $address->state,
+                        'shipping_pincode' => $address->pincode,
+                        'item_count' => $itemCount,
+                        'subtotal' => $subtotal,
+                        'shipping_fee' => $shipping,
+                        'grand_total' => $grand,
+                        'currency' => 'INR',
+                        'payment_method' => 'cod',
+                        'payment_status' => 'unpaid',
+                        'timeline' => OrderTimeline::forStatus('processing', $placedAt, null),
+                        'handoff_status' => null,
+                    ]);
+                } else {
+                    $order = Order::query()->create([
+                        'user_id' => $user->id,
+                        'number' => $this->nextOrderNumber(),
+                        'status' => 'pending_payment',
+                        'address_id' => $address->id,
+                        'shipping_name' => $address->name,
+                        'shipping_phone' => $address->phone,
+                        'shipping_line1' => $address->line1,
+                        'shipping_line2' => $address->line2,
+                        'shipping_city' => $address->city,
+                        'shipping_state' => $address->state,
+                        'shipping_pincode' => $address->pincode,
+                        'item_count' => $itemCount,
+                        'subtotal' => $subtotal,
+                        'shipping_fee' => $shipping,
+                        'grand_total' => $grand,
+                        'currency' => 'INR',
+                        'payment_method' => 'zoho',
+                        'payment_status' => 'unpaid',
+                        'timeline' => OrderTimeline::initialPending(),
+                        'handoff_status' => null,
+                    ]);
+                }
 
                 foreach ($lines as $line) {
                     $order->items()->create($line);
+                }
+
+                // Clear cart only on successful COD place (Zoho waits until paid).
+                if ($isCod) {
+                    CartItem::query()->where('user_id', $user->id)->delete();
                 }
 
                 return $order->load('items');
             });
         } catch (RuntimeException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        if ($isCod) {
+            return (new OrderResource($order))
+                ->response()
+                ->setStatusCode(201);
         }
 
         try {
@@ -179,6 +224,12 @@ class OrderController extends Controller
     public function paymentStatus(Request $request, string $order): JsonResponse
     {
         $model = $this->findOwnedOrder($request, $order);
+
+        if ($model->payment_method === 'cod') {
+            return response()->json([
+                'message' => 'Payment status polling is not available for cash-on-delivery orders.',
+            ], 422);
+        }
 
         // Confirm with Zoho when still unpaid/pending — never trust client/webhook alone.
         if (

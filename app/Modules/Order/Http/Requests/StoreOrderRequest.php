@@ -23,6 +23,11 @@ class StoreOrderRequest extends FormRequest
                 'integer',
                 Rule::exists('addresses', 'id')->where(fn ($q) => $q->where('user_id', $this->user()->id)),
             ],
+            'payment_method' => [
+                'sometimes',
+                'string',
+                Rule::in(['zoho', 'cod']),
+            ],
         ];
     }
 }

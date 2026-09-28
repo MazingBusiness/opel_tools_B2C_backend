@@ -29,6 +29,7 @@ class OrderTrackResource extends JsonResource
             'id' => $this->number,
             'number' => $this->number,
             'status' => $this->status,
+            'payment_method' => $this->payment_method ?: 'zoho',
             'payment_status' => $this->payment_status,
             'placed_at' => $this->created_at?->toIso8601String(),
             'item_count' => $this->item_count,

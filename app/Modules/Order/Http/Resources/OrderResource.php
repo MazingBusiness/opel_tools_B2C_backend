@@ -24,6 +24,7 @@ class OrderResource extends JsonResource
             'db_id' => $this->id,
             'number' => $this->number,
             'status' => $this->status,
+            'payment_method' => $this->payment_method ?: 'zoho',
             'payment_status' => $this->payment_status,
             'currency' => $this->currency,
             'item_count' => $this->item_count,
