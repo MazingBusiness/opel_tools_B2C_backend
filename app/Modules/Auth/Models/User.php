@@ -32,6 +32,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'phone_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_staff' => 'boolean',
         ];
     }
 

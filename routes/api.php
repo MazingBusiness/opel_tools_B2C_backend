@@ -16,4 +16,5 @@ Route::prefix('v1')->group(function (): void {
     require app_path('Modules/Cart/routes.php');
     require app_path('Modules/Address/routes.php');
     require app_path('Modules/Order/routes.php');
+    require app_path('Modules/Admin/routes.php');
 });

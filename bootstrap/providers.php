@@ -6,6 +6,7 @@ use App\Modules\Wishlist\Providers\WishlistServiceProvider;
 use App\Modules\Cart\Providers\CartServiceProvider;
 use App\Modules\Address\Providers\AddressServiceProvider;
 use App\Modules\Order\Providers\OrderServiceProvider;
+use App\Modules\Admin\Providers\AdminServiceProvider;
 use App\Providers\AppServiceProvider;
 
 return [
@@ -16,4 +17,5 @@ return [
     CartServiceProvider::class,
     AddressServiceProvider::class,
     OrderServiceProvider::class,
+    AdminServiceProvider::class,
 ];
