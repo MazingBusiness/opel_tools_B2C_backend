@@ -21,6 +21,7 @@ class AdminUserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'is_staff' => (bool) $this->is_staff,
+            'created_at' => $this->created_at,
         ];
     }
 }
