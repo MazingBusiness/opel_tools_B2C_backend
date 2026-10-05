@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\Admin\Http\Controllers\AdminAuthController;
+use App\Modules\Admin\Http\Controllers\AdminUserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin/auth')->group(function (): void {
@@ -20,4 +21,12 @@ Route::prefix('admin/auth')->group(function (): void {
             ->middleware('throttle:admin-password-change');
         Route::post('/logout', [AdminAuthController::class, 'logout']);
     });
+});
+
+// Admin Users v0: shoppers only (staff ids 404).
+Route::prefix('admin/users')->middleware(['auth:sanctum', 'admin'])->group(function (): void {
+    Route::get('/', [AdminUserController::class, 'index']);
+    Route::get('/{id}', [AdminUserController::class, 'show'])->whereNumber('id');
+    Route::post('/{id}/deactivate', [AdminUserController::class, 'deactivate'])->whereNumber('id');
+    Route::post('/{id}/activate', [AdminUserController::class, 'activate'])->whereNumber('id');
 });

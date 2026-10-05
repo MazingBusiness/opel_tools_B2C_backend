@@ -8,6 +8,7 @@ use App\Modules\Auth\Http\Requests\VerifyOtpRequest;
 use App\Modules\Auth\Http\Resources\UserResource;
 use App\Modules\Auth\Services\AuthService;
 use App\Modules\Auth\Services\OtpService;
+use App\Modules\Auth\Support\DisabledAccount;
 use App\Modules\Auth\Support\LoginIdentifier;
 use Illuminate\Http\JsonResponse;
 use RuntimeException;
@@ -38,6 +39,11 @@ class OtpController extends Controller
         $otp->verify($identifier, $request->validated('code'));
 
         $user = $auth->loginOrRegister($identifier);
+
+        if ($user->isDisabled()) {
+            return DisabledAccount::response();
+        }
+
         $token = $user->createToken('opel-b2c')->plainTextToken;
 
         return response()->json([

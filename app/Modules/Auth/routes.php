@@ -13,7 +13,7 @@ Route::prefix('auth')->group(function (): void {
 
     Route::post('/google', [GoogleAuthController::class, 'store'])->middleware('throttle:google');
 
-    Route::middleware('auth:sanctum')->group(function (): void {
+    Route::middleware(['auth:sanctum', 'shopper.active'])->group(function (): void {
         Route::get('/me', [ProfileController::class, 'show']);
         Route::patch('/profile', [ProfileController::class, 'update']);
         Route::post('/logout', [ProfileController::class, 'logout']);

@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'admin' => \App\Modules\Admin\Http\Middleware\EnsureAdmin::class,
+            'shopper.active' => \App\Modules\Auth\Http\Middleware\EnsureShopperActive::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

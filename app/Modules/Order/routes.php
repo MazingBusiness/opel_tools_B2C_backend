@@ -8,7 +8,7 @@ Route::get('/orders/track/{number}', [OrderController::class, 'track'])
     ->middleware('throttle:30,1')
     ->where('number', 'OPL-[A-Za-z0-9\-]+');
 
-Route::middleware(['auth:sanctum', 'throttle:orders'])->prefix('orders')->group(function (): void {
+Route::middleware(['auth:sanctum', 'shopper.active', 'throttle:orders'])->prefix('orders')->group(function (): void {
     Route::get('/', [OrderController::class, 'index']);
     Route::post('/', [OrderController::class, 'store']);
     Route::get('/{order}/payment-status', [OrderController::class, 'paymentStatus'])

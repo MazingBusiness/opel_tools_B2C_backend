@@ -28,6 +28,7 @@ class UserFactory extends Factory
             'phone_verified_at' => now(),
             'password' => null,
             'is_staff' => false,
+            'disabled_at' => null,
             'remember_token' => Str::random(10),
         ];
     }
@@ -52,6 +53,13 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'is_staff' => true,
             'password' => 'password',
+        ]);
+    }
+
+    public function disabled(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'disabled_at' => now(),
         ]);
     }
 }

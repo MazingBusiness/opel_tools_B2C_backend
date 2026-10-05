@@ -35,7 +35,17 @@ class User extends Authenticatable implements CanResetPasswordContract
             'phone_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_staff' => 'boolean',
+            'disabled_at' => 'datetime',
         ];
+    }
+
+    /**
+     * disabled_at is intentionally NOT fillable: only the admin
+     * activate/deactivate endpoints may change it (via forceFill).
+     */
+    public function isDisabled(): bool
+    {
+        return $this->disabled_at !== null;
     }
 
     public function profileComplete(): bool

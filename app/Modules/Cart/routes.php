@@ -3,7 +3,7 @@
 use App\Modules\Cart\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth:sanctum', 'throttle:cart'])->prefix('cart')->group(function (): void {
+Route::middleware(['auth:sanctum', 'shopper.active', 'throttle:cart'])->prefix('cart')->group(function (): void {
     Route::get('/', [CartController::class, 'show']);
     Route::get('/count', [CartController::class, 'count']);
     Route::post('/items', [CartController::class, 'store']);

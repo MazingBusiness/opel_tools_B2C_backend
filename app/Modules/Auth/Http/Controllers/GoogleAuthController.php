@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\Auth\Http\Requests\GoogleLoginRequest;
 use App\Modules\Auth\Http\Resources\UserResource;
 use App\Modules\Auth\Services\FirebaseAuthService;
+use App\Modules\Auth\Support\DisabledAccount;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -18,6 +19,11 @@ class GoogleAuthController extends Controller
         }
 
         $user = $auth->login($request->validated('id_token'));
+
+        if ($user->isDisabled()) {
+            return DisabledAccount::response();
+        }
+
         $token = $user->createToken('opel-b2c')->plainTextToken;
 
         return response()->json([
