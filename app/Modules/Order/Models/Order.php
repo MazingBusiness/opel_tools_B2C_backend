@@ -28,6 +28,7 @@ class Order extends Model
         'currency',
         'payment_method',
         'payment_status',
+        'payment_notes',
         'payment_link_id',
         'payment_link_url',
         'payment_link_expires_at',

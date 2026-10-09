@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\Admin\Http\Controllers\AdminAuthController;
+use App\Modules\Admin\Http\Controllers\AdminOrderController;
 use App\Modules\Admin\Http\Controllers\AdminUserController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,4 +30,17 @@ Route::prefix('admin/users')->middleware(['auth:sanctum', 'admin'])->group(funct
     Route::get('/{id}', [AdminUserController::class, 'show'])->whereNumber('id');
     Route::post('/{id}/deactivate', [AdminUserController::class, 'deactivate'])->whereNumber('id');
     Route::post('/{id}/activate', [AdminUserController::class, 'activate'])->whereNumber('id');
+});
+
+// Admin Orders v0: lookup by order number. User-scoped list via ?user_id= only.
+Route::prefix('admin/orders')->middleware(['auth:sanctum', 'admin'])->group(function (): void {
+    Route::get('/', [AdminOrderController::class, 'index']);
+    Route::get('/{number}', [AdminOrderController::class, 'show'])
+        ->where('number', 'OPL-[A-Za-z0-9\-]+');
+    Route::patch('/{number}/fulfilment', [AdminOrderController::class, 'updateFulfilment'])
+        ->where('number', 'OPL-[A-Za-z0-9\-]+');
+    Route::post('/{number}/cod-collected', [AdminOrderController::class, 'markCodCollected'])
+        ->where('number', 'OPL-[A-Za-z0-9\-]+');
+    Route::patch('/{number}/payment-notes', [AdminOrderController::class, 'updatePaymentNotes'])
+        ->where('number', 'OPL-[A-Za-z0-9\-]+');
 });
