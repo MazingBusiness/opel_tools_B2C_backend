@@ -2,6 +2,7 @@
 
 use App\Modules\Admin\Http\Controllers\AdminAuthController;
 use App\Modules\Admin\Http\Controllers\AdminOrderController;
+use App\Modules\Admin\Http\Controllers\AdminSeoController;
 use App\Modules\Admin\Http\Controllers\AdminUserController;
 use Illuminate\Support\Facades\Route;
 
@@ -43,4 +44,15 @@ Route::prefix('admin/orders')->middleware(['auth:sanctum', 'admin'])->group(func
         ->where('number', 'OPL-[A-Za-z0-9\-]+');
     Route::patch('/{number}/payment-notes', [AdminOrderController::class, 'updatePaymentNotes'])
         ->where('number', 'OPL-[A-Za-z0-9\-]+');
+});
+
+// Admin SEO v0: targets = page | product | category_group | category.
+Route::prefix('admin/seo')->middleware(['auth:sanctum', 'admin'])->group(function (): void {
+    Route::get('/targets', [AdminSeoController::class, 'targets']);
+    Route::get('/{type}/{key}', [AdminSeoController::class, 'show'])
+        ->whereIn('type', ['page', 'product', 'category_group', 'category'])
+        ->where('key', '[A-Za-z0-9_\-]{1,64}');
+    Route::put('/{type}/{key}', [AdminSeoController::class, 'update'])
+        ->whereIn('type', ['page', 'product', 'category_group', 'category'])
+        ->where('key', '[A-Za-z0-9_\-]{1,64}');
 });

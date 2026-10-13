@@ -7,6 +7,7 @@ use App\Modules\Cart\Providers\CartServiceProvider;
 use App\Modules\Address\Providers\AddressServiceProvider;
 use App\Modules\Order\Providers\OrderServiceProvider;
 use App\Modules\Admin\Providers\AdminServiceProvider;
+use App\Modules\Seo\Providers\SeoServiceProvider;
 use App\Providers\AppServiceProvider;
 
 return [
@@ -18,4 +19,5 @@ return [
     AddressServiceProvider::class,
     OrderServiceProvider::class,
     AdminServiceProvider::class,
+    SeoServiceProvider::class,
 ];
