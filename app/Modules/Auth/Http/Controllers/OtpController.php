@@ -20,8 +20,17 @@ class OtpController extends Controller
     {
         $identifier = LoginIdentifier::parse($request->validated('identifier'));
 
+        $wait = $otp->cooldownRemaining($identifier);
+        if ($wait > 0) {
+            return response()->json([
+                'ok' => false,
+                'message' => "Please wait {$wait}s before requesting another code.",
+                'retry_after' => $wait,
+            ], 429)->header('Retry-After', (string) $wait);
+        }
+
         try {
-            $otp->issue($identifier);
+            $challenge = $otp->issue($identifier, $request->validated('prefer'));
         } catch (RuntimeException $exception) {
             throw new HttpException(503, 'Unable to send OTP right now.', $exception);
         }
@@ -29,7 +38,10 @@ class OtpController extends Controller
         return response()->json([
             'ok' => true,
             'channel' => $identifier->channel,
+            // email | whatsapp | sms | log. whatsapp = accepted by Meta, not guaranteed delivered.
+            'delivery' => $challenge->delivered_via,
             'expires_in' => (int) config('otp.ttl_seconds'),
+            'resend_after' => (int) config('otp.resend_cooldown_seconds', 45),
         ]);
     }
 

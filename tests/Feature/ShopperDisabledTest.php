@@ -106,6 +106,7 @@ class ShopperDisabledTest extends TestCase
         $this->otpVerify('back@example.com')->assertForbidden();
 
         $user->forceFill(['disabled_at' => null])->save();
+        $this->travel(60)->seconds(); // past the OTP resend cooldown
 
         $this->otpVerify('back@example.com')
             ->assertOk()

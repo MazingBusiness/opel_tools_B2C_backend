@@ -19,6 +19,8 @@ class RequestOtpRequest extends FormRequest
     {
         return [
             'identifier' => ['required', 'string', 'max:255', new ValidLoginIdentifier],
+            // "Resend by SMS": skip WhatsApp for this send (phones only; ignored for email).
+            'prefer' => ['nullable', 'string', 'in:sms'],
         ];
     }
 }

@@ -41,7 +41,8 @@ class AuthTest extends TestCase
             ->assertJson([
                 'ok' => true,
                 'channel' => 'email',
-                'expires_in' => 120,
+                'delivery' => 'email',
+                'expires_in' => 300,
             ]);
 
         Notification::assertSentOnDemand(EmailOtpNotification::class);

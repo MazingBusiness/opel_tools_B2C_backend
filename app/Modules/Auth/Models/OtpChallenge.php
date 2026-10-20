@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 #[Fillable([
     'channel',
     'identifier',
+    'delivered_via',
     'code_hash',
     'expires_at',
     'attempts',
