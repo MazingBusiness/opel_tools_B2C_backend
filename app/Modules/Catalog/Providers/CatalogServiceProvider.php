@@ -5,6 +5,7 @@ namespace App\Modules\Catalog\Providers;
 use App\Modules\Catalog\Console\ApplySeedIdsCommand;
 use App\Modules\Catalog\Console\ExportCatalogIdsCommand;
 use App\Modules\Catalog\Console\ResetCatalogSeedCommand;
+use App\Modules\Catalog\Console\SyncB2bCatalogCommand;
 use App\Modules\Catalog\Services\CatalogSearch;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -25,6 +26,7 @@ class CatalogServiceProvider extends ServiceProvider
                 ExportCatalogIdsCommand::class,
                 ApplySeedIdsCommand::class,
                 ResetCatalogSeedCommand::class,
+                SyncB2bCatalogCommand::class,
             ]);
         }
 

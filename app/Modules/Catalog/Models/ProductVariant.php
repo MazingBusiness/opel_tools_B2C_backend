@@ -49,7 +49,10 @@ class ProductVariant extends Model
         $override = $this->overrideValue($key);
 
         return match ($key) {
-            'unit_price' => CatalogPricing::effective($b2b === null ? null : (string) $b2b, $override === null ? null : (string) $override),
+            'unit_price', 'list_price', 'mrp' => CatalogPricing::effective(
+                $b2b === null ? null : (string) $b2b,
+                $override === null ? null : (string) $override,
+            ),
             // Stock override is a cap: it can lower availability, never raise it.
             'current_stock' => $override === null ? $b2b : min((int) $b2b, (int) $override),
             default => $override ?? $b2b,
@@ -74,7 +77,9 @@ class ProductVariant extends Model
      */
     public static function effectivePriceSql(string $table = 'product_variants'): string
     {
-        return "coalesce((select pvo.unit_price from product_variant_overrides pvo where pvo.product_variant_id = {$table}.id), {$table}.unit_price)";
+        $raw = CatalogPricing::pricingLogicSql("{$table}.unit_price");
+
+        return "coalesce((select pvo.unit_price from product_variant_overrides pvo where pvo.product_variant_id = {$table}.id), {$raw})";
     }
 
     /** SQL twin of the effective stock: min(B2B stock, override cap). */

@@ -7,13 +7,15 @@ namespace App\Modules\Catalog\Support;
  *
  *   effective = admin price override ?? pricingLogic(raw B2B price)
  *
- * pricingLogic() is the seam for the future "B2B price x logic" rule; today it
- * is the identity. SQL paths (price filter / sort / facets in CatalogSearch)
- * mirror this with ProductVariant::effectivePriceSql() and must be updated
- * together if the logic stops being the identity.
+ * pricingLogic() is the B2C markup on the raw B2B value (MRP + 10%).
+ * An admin override is the final price and is not marked up again.
+ * SQL paths (price filter / sort / facets in CatalogSearch) mirror this
+ * with ProductVariant::effectivePriceSql() and must stay in sync.
  */
 final class CatalogPricing
 {
+    public const MARKUP = 1.10;
+
     public static function effective(?string $b2bPrice, ?string $override): ?string
     {
         if ($override !== null) {
@@ -25,6 +27,14 @@ final class CatalogPricing
 
     public static function pricingLogic(string $b2bPrice): string
     {
-        return $b2bPrice;
+        $cents = (int) round((float) $b2bPrice * 100);
+
+        return number_format((int) round($cents * self::MARKUP) / 100, 2, '.', '');
+    }
+
+    /** SQL twin of pricingLogic() for a raw B2B price expression. */
+    public static function pricingLogicSql(string $expression): string
+    {
+        return "round({$expression} * 1.10, 2)";
     }
 }

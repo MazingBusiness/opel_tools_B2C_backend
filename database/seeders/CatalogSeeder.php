@@ -2,76 +2,23 @@
 
 namespace Database\Seeders;
 
-use App\Modules\Catalog\Support\PartNumber;
+use App\Modules\Catalog\Services\B2bCatalogSync;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 use RuntimeException;
 
 class CatalogSeeder extends Seeder
 {
     /**
-     * Longest prefix first so "Forever Gold" wins over "Forever".
+     * Test / fixture loader for the original 45 air blowers (fixed ids).
      *
-     * @var list<array{0: string, 1: string}>
-     */
-    private const BRAND_PREFIXES = [
-        ['FOREVER GOLD', 'Forever Gold'],
-        ['JON BHANDARI', 'Jon Bhandari'],
-        ['GOLDEN BULLET', 'Golden Bullet'],
-        ['SILVER BULLET', 'Silver Bullet'],
-        ['XTRA POWER', 'Xtra Power'],
-        ['AUTO POWER', 'Auto Power'],
-        ['AXTRIM PRO', 'Axtrim Pro'],
-        ['BLACK STAR', 'Black Star'],
-        ['KP TECH', 'KP Tech'],
-        ['HI MAX', 'Hi Max'],
-        ['POWERMATIC', 'Powermatic'],
-        ['MASTECH', 'Mastech'],
-        ['BHAVANI', 'Bhavani'],
-        ['EVERRON', 'Everron'],
-        ['CASTLE', 'Castle'],
-        ['MATRIX', 'Matrix'],
-        ['MAKUTE', 'Makute'],
-        ['AMBER', 'Amber'],
-        ['EAGLE', 'Eagle'],
-        ['AKARI', 'Akari'],
-        ['POKER', 'Poker'],
-        ['YOCA', 'Yoca'],
-        ['XLNT', 'XLNT'],
-        ['DELI', 'Deli'],
-        ['TCA', 'TCA'],
-        ['MAF', 'MAF'],
-        ['OPEL', 'OPEL'],
-        ['FOREVER', 'Forever'],
-    ];
-
-    /**
-     * @var array<string, string>
-     */
-    private const WAREHOUSE_CODES = [
-        'Delhi' => 'DELHI',
-        'Mumbai' => 'MUMBAI',
-        'Kolkata' => 'KOLKATA',
-    ];
-
-    /**
-     * Brand ids by slug (brands are matched by slug, not fixed ids).
-     *
-     * @var array<string, int>
-     */
-    private array $brands = [];
-
-    /**
-     * Original B2B AIR BLOWER catalog (pages 1–3) until the product feed exists.
-     *
-     * SAFE by default: upserts by the FIXED ids in the fixture (B2B base columns
-     * only), inserts missing rows, never deletes, never touches *_overrides or
-     * seo_meta. Aborts before writing if a fixed id is already used by a row with
-     * a different natural key (variants/products by part_no, categories/groups
-     * by slug). Full delete + reload: resetAndReload() (catalog:reset-seed).
+     * Live catalog updates go through catalog:sync-b2b. This seeder is kept so
+     * CatalogTest and CatalogSeederTest can load the fixture. It upserts via
+     * B2bCatalogSync (match by part_no), never deletes, never touches overrides
+     * or seo_meta. Aborts before writing if a fixed id is already used by a row
+     * with a different natural key. Full delete + reload: resetAndReload().
      */
     public function run(): void
     {
@@ -96,31 +43,11 @@ class CatalogSeeder extends Seeder
     protected function writeCatalog(array $items, array $groups, array $categories): void
     {
         $now = now();
-        $taxId = $this->upsertTax($now);
-
-        DB::table('category_groups')->upsert(array_map(fn (array $g): array => [
-            'id' => $g['id'],
-            'name' => $g['name'],
-            'slug' => $g['slug'],
-            'is_active' => true,
-            'created_at' => $now,
-            'updated_at' => $now,
-        ], array_values($groups)), ['id'], ['name', 'slug', 'is_active', 'updated_at']);
-
-        DB::table('categories')->upsert(array_map(fn (array $c): array => [
-            'id' => $c['id'],
-            'name' => $c['name'],
-            'slug' => $c['slug'],
-            'parent_id' => $c['parent_id'],
-            'category_group_id' => $c['category_group_id'],
-            'banner' => $c['banner'],
-            'is_active' => true,
-            'created_at' => $now,
-            'updated_at' => $now,
-        ], array_values($categories)), ['id'], ['name', 'slug', 'parent_id', 'category_group_id', 'banner', 'is_active', 'updated_at']);
+        $sync = app(B2bCatalogSync::class);
+        $taxId = $sync->upsertTax($now);
 
         foreach ($items as $item) {
-            $this->upsertProduct($item, $taxId, $now);
+            $sync->upsertItem($item, $now, $taxId);
         }
     }
 
@@ -240,7 +167,7 @@ class CatalogSeeder extends Seeder
                 'slug' => $c['slug'],
                 'parent_id' => isset($c['parent_id']) ? (int) $c['parent_id'] : null,
                 'category_group_id' => $g['id'],
-                'banner' => $this->httpUrl($c['image'] ?? null),
+                'banner' => B2bCatalogSync::httpUrl($c['image'] ?? null),
             ];
         }
 
@@ -326,214 +253,12 @@ class CatalogSeeder extends Seeder
         }
     }
 
-    private function upsertTax(\DateTimeInterface $now): int
-    {
-        $id = DB::table('taxes')->where('name', 'GST')->orderBy('id')->value('id');
-        if ($id !== null) {
-            DB::table('taxes')->where('id', $id)->update(['rate' => '18.00', 'updated_at' => $now]);
-
-            return (int) $id;
-        }
-
-        return (int) DB::table('taxes')->insertGetId([
-            'name' => 'GST', 'rate' => '18.00', 'created_at' => $now, 'updated_at' => $now,
-        ]);
-    }
-
-    /**
-     * B2B base columns only. Never touches override tables.
-     *
-     * @param  array<string, mixed>  $item
-     */
-    private function upsertProduct(array $item, int $taxId, \DateTimeInterface $now): void
-    {
-        $photos = $this->photoUrls($item);
-        $thumb = $this->httpUrl(data_get($item, 'thumb_img.file_name'));
-        $mrp = $item['mrp'];
-        $stockByCode = $this->stockByCode($item);
-        $brandId = $this->brandIdFor((string) $item['name'], $now);
-        $productId = (int) $item['id'];
-        $variantId = (int) $item['variant_id'];
-
-        $productColumns = [
-            'name', 'slug', 'hsncode', 'group_id', 'category_id', 'brand_id', 'thumbnail_img', 'photos',
-            'description', 'tags', 'published', 'approved', 'unit', 'min_qty', 'piece_per_carton', 'synced_at', 'updated_at',
-        ];
-        DB::table('products')->upsert([[
-            'id' => $productId,
-            'name' => $item['name'],
-            'slug' => $item['slug'],
-            'hsncode' => null,
-            'group_id' => (int) $item['category_group']['id'],
-            'category_id' => (int) $item['category']['id'],
-            'brand_id' => $brandId,
-            'thumbnail_img' => $thumb,
-            'photos' => $photos === [] ? null : json_encode($photos, JSON_UNESCAPED_SLASHES),
-            'description' => $item['name'],
-            'tags' => 'air-blower,power-tools',
-            'published' => true,
-            'approved' => true,
-            'unit' => 'pc',
-            'min_qty' => 1,
-            'piece_per_carton' => 1,
-            'synced_at' => $now,
-            'created_at' => $now,
-            'updated_at' => $now,
-        ]], ['id'], $productColumns);
-
-        DB::table('product_taxes')->upsert([[
-            'product_id' => $productId,
-            'tax_id' => $taxId,
-            'tax' => '18.00',
-            'tax_type' => 'percent',
-            'created_at' => $now,
-            'updated_at' => $now,
-        ]], ['product_id', 'tax_id'], ['tax', 'tax_type', 'updated_at']);
-
-        $variantColumns = [
-            'product_id', 'part_no', 'part_no_normalized', 'options', 'label', 'thumbnail_img', 'unit_price',
-            'list_price', 'mrp', 'carton_price', 'current_stock', 'min_qty', 'hsncode', 'is_default', 'position', 'updated_at',
-        ];
-        DB::table('product_variants')->upsert([[
-            'id' => $variantId,
-            'product_id' => $productId,
-            'part_no' => $item['part_no'],
-            'part_no_normalized' => PartNumber::normalize((string) $item['part_no']),
-            'options' => json_encode([]),
-            'label' => null,
-            'thumbnail_img' => $thumb,
-            'unit_price' => $mrp,
-            'list_price' => $mrp,
-            'mrp' => $mrp,
-            'carton_price' => null,
-            'current_stock' => array_sum($stockByCode),
-            'min_qty' => 1,
-            'hsncode' => null,
-            'is_default' => true,
-            'position' => 0,
-            'created_at' => $now,
-            'updated_at' => $now,
-        ]], ['id'], $variantColumns);
-
-        foreach ($stockByCode as $code => $qty) {
-            DB::table('product_warehouses')->upsert([[
-                'product_variant_id' => $variantId,
-                'warehouse_code' => $code,
-                'qty' => $qty,
-                'price' => $mrp,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ]], ['product_variant_id', 'warehouse_code'], ['qty', 'price', 'updated_at']);
-        }
-    }
-
-    /**
-     * Explicit-id inserts do not advance Postgres sequences; reset them (and the
-     * MySQL AUTO_INCREMENT, defensively) so new rows get ids above the max.
-     * SQLite AUTOINCREMENT tracks explicit ids itself.
-     */
     private function syncSequences(): void
     {
-        $driver = DB::connection()->getDriverName();
-
-        foreach (['category_groups', 'categories', 'products', 'product_variants'] as $table) {
-            $max = (int) DB::table($table)->max('id');
-            if ($driver === 'pgsql') {
-                DB::select("select setval(pg_get_serial_sequence('$table', 'id'), ?, ?)", [max(1, $max), $max > 0]);
-            } elseif (in_array($driver, ['mysql', 'mariadb'], true)) {
-                DB::statement("ALTER TABLE `$table` AUTO_INCREMENT = ".($max + 1));
-            }
-        }
+        app(B2bCatalogSync::class)->syncSequences();
     }
 
-    /**
-     * @param  array<string, mixed>  $item
-     * @return list<string>
-     */
-    private function photoUrls(array $item): array
-    {
-        $urls = [];
-
-        foreach ($item['images'] ?? [] as $image) {
-            $url = $this->httpUrl($image['file_name'] ?? null);
-
-            if ($url !== null) {
-                $urls[] = $url;
-            }
-        }
-
-        return $urls;
-    }
-
-    /**
-     * @param  array<string, mixed>  $item
-     * @return array<string, int>
-     */
-    private function stockByCode(array $item): array
-    {
-        $qtyByCode = [];
-
-        foreach ($item['stocks'] ?? [] as $stock) {
-            $name = (string) ($stock['warehouse_name'] ?? '');
-            $code = self::WAREHOUSE_CODES[$name] ?? Str::upper($name);
-
-            if ($code === '') {
-                continue;
-            }
-
-            $qtyByCode[$code] = ($qtyByCode[$code] ?? 0) + (int) ($stock['qty'] ?? 0);
-        }
-
-        return $qtyByCode;
-    }
-
-    private function brandIdFor(string $productName, \DateTimeInterface $now): int
-    {
-        $name = $this->brandName($productName);
-        $slug = Str::slug($name);
-
-        if (isset($this->brands[$slug])) {
-            return $this->brands[$slug];
-        }
-
-        $id = DB::table('brands')->where('slug', $slug)->value('id');
-        if ($id === null) {
-            $id = DB::table('brands')->insertGetId([
-                'name' => $name, 'slug' => $slug, 'logo' => null, 'is_active' => true,
-                'created_at' => $now, 'updated_at' => $now,
-            ]);
-        }
-
-        return $this->brands[$slug] = (int) $id;
-    }
-
-    private function brandName(string $productName): string
-    {
-        $upper = Str::upper($productName);
-
-        foreach (self::BRAND_PREFIXES as [$prefix, $display]) {
-            if (str_starts_with($upper, $prefix)) {
-                return $display;
-            }
-        }
-
-        return 'Unbranded';
-    }
-
-    private function httpUrl(mixed $url): ?string
-    {
-        if (! is_string($url) || $url === '') {
-            return null;
-        }
-
-        if (str_starts_with($url, 'https://') || str_starts_with($url, 'http://')) {
-            return $url;
-        }
-
-        return null;
-    }
-
-    /** Only reachable through resetAndReload() (guarded); runs inside its transaction. */
+        /** Only reachable through resetAndReload() (guarded); runs inside its transaction. */
     private function deleteCatalog(): void
     {
         DB::table('categories')->update(['parent_id' => null]); // self-reference first

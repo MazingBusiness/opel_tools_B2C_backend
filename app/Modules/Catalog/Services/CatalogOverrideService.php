@@ -191,9 +191,10 @@ class CatalogOverrideService
         foreach ($prices as $field) {
             $override = array_key_exists($field, $values) ? $values[$field] : $model->overrideValue($field);
             $b2b = $model->b2bValue($field);
-            $effective[$field] = $field === 'unit_price'
-                ? CatalogPricing::effective($b2b === null ? null : (string) $b2b, $override === null ? null : (string) $override)
-                : ($override ?? $b2b);
+            $effective[$field] = CatalogPricing::effective(
+                $b2b === null ? null : (string) $b2b,
+                $override === null ? null : (string) $override,
+            );
         }
 
         $unit = $effective['unit_price'];

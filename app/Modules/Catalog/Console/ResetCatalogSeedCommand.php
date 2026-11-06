@@ -2,29 +2,19 @@
 
 namespace App\Modules\Catalog\Console;
 
-use Database\Seeders\CatalogSeeder;
 use Illuminate\Console\Command;
-use RuntimeException;
 
-/** Guarded full catalog reset (delete + reload). Requires CATALOG_SEED_ALLOW_RESET=true. */
+/** Previously deleted and reloaded the static air-blower fixture. That fixture is test-only now. */
 class ResetCatalogSeedCommand extends Command
 {
     protected $signature = 'catalog:reset-seed';
 
-    protected $description = 'DELETE and reload the B2B catalog tables from the seed fixture (guarded; overrides and seo_meta are kept)';
+    protected $description = 'Disabled: the static air-blower fixture is no longer the catalog source of truth';
 
     public function handle(): int
     {
-        try {
-            (new CatalogSeeder)->setContainer($this->laravel)->setCommand($this)->resetAndReload();
-        } catch (RuntimeException $e) {
-            $this->error($e->getMessage());
+        $this->error('catalog:reset-seed no longer reloads the static air-blower fixture. Use catalog:sync-b2b to refresh the catalog from B2B.');
 
-            return self::FAILURE;
-        }
-
-        $this->info('Catalog reset and reloaded.');
-
-        return self::SUCCESS;
+        return self::FAILURE;
     }
 }

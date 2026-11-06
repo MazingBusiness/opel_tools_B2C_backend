@@ -171,8 +171,8 @@ class CatalogOverridesTest extends TestCase
 
     public function test_save_rejects_unit_price_above_effective_mrp_or_list_price(): void
     {
-        // B2B: unit 1000, mrp 1200, list 1200.
-        $this->save('variants', $this->variantId(), ['unit_price' => 1300])
+        // B2B: unit 1000, mrp 1200, list 1200 → effective 1100 / 1320 / 1320.
+        $this->save('variants', $this->variantId(), ['unit_price' => 1400])
             ->assertUnprocessable()->assertJsonValidationErrors(['fields.unit_price']);
         $this->save('variants', $this->variantId(), ['mrp' => 900])
             ->assertUnprocessable()->assertJsonValidationErrors(['fields.unit_price']);
@@ -194,7 +194,7 @@ class CatalogOverridesTest extends TestCase
 
     public function test_reset_rejects_price_inversion(): void
     {
-        // Raise both, then try to reset only mrp → B2B mrp 1200 < unit 1500.
+        // Raise both, then try to reset only mrp → effective B2B mrp 1320 < unit 1500.
         $res = $this->save('variants', $this->variantId(), ['unit_price' => 1500, 'mrp' => 1600, 'list_price' => 1600])->assertOk();
         $this->asAdmin()->postJson('/api/v1/admin/catalog/variants/'.$this->variantId().'/reset', [
             'expected_version' => $res->json('version'),

@@ -224,8 +224,10 @@ class CatalogTest extends TestCase
 
         $opel = ProductVariant::query()->where('part_no', 'MZ11018')->first();
         $this->assertNotNull($opel);
-        $this->assertEquals(1055, (float) $opel->unit_price);
-        $this->assertEquals(1055, (float) $opel->mrp);
+        $this->assertEquals(1055, (float) $opel->b2bValue('unit_price'));
+        $this->assertEquals(1160.5, (float) $opel->unit_price);
+        $this->assertEquals(1055, (float) $opel->b2bValue('mrp'));
+        $this->assertEquals(1160.5, (float) $opel->mrp);
         $this->assertEquals(372, $opel->current_stock);
         $this->assertStringContainsString(
             'mazingbusiness.com/public/uploads/all/thumb_/',

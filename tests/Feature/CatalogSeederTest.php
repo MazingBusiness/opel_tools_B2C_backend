@@ -195,7 +195,8 @@ class CatalogSeederTest extends TestCase
         DB::table('products')->where('id', 1)->update(['name' => 'Drifted']);
         config(['catalog.seed_allow_reset' => true]);
 
-        $this->artisan('catalog:reset-seed')->assertSuccessful();
+        $this->artisan('catalog:reset-seed')->assertFailed();
+        (new CatalogSeeder)->resetAndReload();
 
         $this->assertSame(45, Product::query()->count());
         $this->assertSame('OPEL 5332 - ELECTRIC BLOWER 600WATTS', DB::table('products')->where('id', 1)->value('name'));
