@@ -4,6 +4,7 @@ namespace App\Modules\Admin\Providers;
 
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
@@ -17,6 +18,10 @@ class AdminServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Admin catalog overrides: "" is a deliberate override (null = reset to B2B),
+        // so keep empty strings on these routes.
+        ConvertEmptyStringsToNull::skipWhen(fn (Request $request): bool => $request->is('api/v1/admin/catalog/*'));
+
         RateLimiter::for('admin-login', function (Request $request) {
             $email = strtolower((string) $request->input('email'));
 

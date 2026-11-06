@@ -24,10 +24,11 @@ class CartItemResource extends JsonResource
             && (bool) $product->approved
             && $variant !== null;
 
-        $unitPrice = $available ? (float) $variant->unit_price : 0.0;
+        // Effective values (admin overrides merged on the model).
+        $unitPrice = $available ? $variant->effectiveUnitPrice() : 0.0;
         $mrp = $available ? (float) ($variant->mrp ?? $variant->list_price ?? $variant->unit_price) : 0.0;
         $listPrice = $available ? (float) ($variant->list_price ?? $variant->unit_price) : 0.0;
-        $stock = $available ? (int) $variant->current_stock : 0;
+        $stock = $available ? $variant->effectiveStock() : 0;
         $minQty = $available
             ? max(1, (int) ($variant->min_qty ?? $product->min_qty ?? 1))
             : 1;

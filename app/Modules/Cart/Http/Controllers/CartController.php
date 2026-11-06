@@ -198,7 +198,7 @@ class CartController extends Controller
         }
 
         $minQty = max(1, (int) ($variant->min_qty ?? $product->min_qty ?? 1));
-        $stock = (int) $variant->current_stock;
+        $stock = $variant->effectiveStock();
 
         if ($stock <= 0) {
             throw ValidationException::withMessages([
@@ -264,13 +264,13 @@ class CartController extends Controller
                 continue;
             }
 
-            $stock = (int) $variant->current_stock;
+            $stock = $variant->effectiveStock();
             $qty = min((int) $item->qty, max(0, $stock));
             if ($qty <= 0) {
                 continue;
             }
 
-            $unit = (float) $variant->unit_price;
+            $unit = $variant->effectiveUnitPrice();
             $mrp = (float) ($variant->mrp ?? $variant->list_price ?? $variant->unit_price);
 
             $lineCount++;

@@ -2,6 +2,9 @@
 
 namespace App\Modules\Catalog\Models;
 
+use App\Modules\Catalog\Models\Concerns\HasCatalogOverride;
+use App\Modules\Catalog\Models\Overrides\ProductOverride;
+use App\Modules\Catalog\Support\CatalogVisibility;
 use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -33,6 +36,43 @@ class Product extends Model
 {
     /** @use HasFactory<ProductFactory> */
     use HasFactory;
+    use HasCatalogOverride;
+
+    /** @var list<string> */
+    protected $with = ['catalogOverride'];
+
+    public static function catalogOverrideModel(): string
+    {
+        return ProductOverride::class;
+    }
+
+    protected function effectiveAttributeKeys(): array
+    {
+        return [
+            'name', 'description', 'thumbnail_img', 'photos', 'tags', 'hsncode',
+            'unit', 'min_qty', 'piece_per_carton', 'published',
+        ];
+    }
+
+    protected function effectiveAttribute(string $key, mixed $b2b): mixed
+    {
+        if ($key === 'published') {
+            // Admin can only hide (product, its category tree or its group).
+            return (bool) $b2b && ! $this->hiddenOnStorefront();
+        }
+
+        return $this->overrideValue($key) ?? $b2b;
+    }
+
+    public function hiddenOnStorefront(): bool
+    {
+        $categoryId = $this->b2bValue('category_id');
+        $groupId = $this->b2bValue('group_id');
+
+        return $this->isHiddenByOverride()
+            || CatalogVisibility::categoryHidden($categoryId === null ? null : (int) $categoryId)
+            || CatalogVisibility::groupHidden($groupId === null ? null : (int) $groupId);
+    }
 
     protected static function newFactory(): ProductFactory
     {
@@ -73,7 +113,14 @@ class Product extends Model
      */
     public function scopePublished(Builder $query): Builder
     {
-        return $query->where('published', true)->where('approved', true);
+        $hiddenCategories = CatalogVisibility::hiddenCategoryIds();
+        $hiddenGroups = CatalogVisibility::hiddenGroupIds();
+
+        return $query->where($query->qualifyColumn('published'), true)
+            ->where($query->qualifyColumn('approved'), true)
+            ->whereDoesntHave('catalogOverride', fn (Builder $o) => $o->where('hidden', true))
+            ->when($hiddenCategories !== [], fn (Builder $q) => $q->whereNotIn($q->qualifyColumn('category_id'), $hiddenCategories))
+            ->when($hiddenGroups !== [], fn (Builder $q) => $q->whereNotIn($q->qualifyColumn('group_id'), $hiddenGroups));
     }
 
     /**

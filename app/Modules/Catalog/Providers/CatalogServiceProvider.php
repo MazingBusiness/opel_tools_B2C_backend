@@ -2,6 +2,9 @@
 
 namespace App\Modules\Catalog\Providers;
 
+use App\Modules\Catalog\Console\ApplySeedIdsCommand;
+use App\Modules\Catalog\Console\ExportCatalogIdsCommand;
+use App\Modules\Catalog\Console\ResetCatalogSeedCommand;
 use App\Modules\Catalog\Services\CatalogSearch;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -17,6 +20,14 @@ class CatalogServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                ExportCatalogIdsCommand::class,
+                ApplySeedIdsCommand::class,
+                ResetCatalogSeedCommand::class,
+            ]);
+        }
+
         RateLimiter::for('catalog', function (Request $request) {
             return Limit::perMinute(60)->by((string) $request->ip());
         });

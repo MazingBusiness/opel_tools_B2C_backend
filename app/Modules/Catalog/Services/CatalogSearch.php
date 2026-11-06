@@ -25,8 +25,9 @@ class CatalogSearch
         $sort = $filters['sort'] ?? null;
 
         $query->addSelect([
+            // Effective (override-aware) price for sorting.
             'default_unit_price' => ProductVariant::query()
-                ->select('unit_price')
+                ->selectRaw(ProductVariant::effectivePriceSql())
                 ->whereColumn('product_variants.product_id', 'products.id')
                 ->where('is_default', true)
                 ->limit(1),
@@ -52,7 +53,7 @@ class CatalogSearch
             ])
             ->withCount('variants')
             ->withExists(['variants as in_stock' => function (Builder $variant): void {
-                $variant->where('current_stock', '>', 0);
+                $variant->whereRaw(ProductVariant::effectiveStockSql().' > 0');
             }])
             ->paginate($perPage)
             ->withQueryString();
@@ -100,20 +101,20 @@ class CatalogSearch
         if (isset($filters['min']) && $filters['min'] !== null && $filters['min'] !== '') {
             $min = $filters['min'];
             $query->whereHas('defaultVariant', function (Builder $variant) use ($min): void {
-                $variant->where('unit_price', '>=', $min);
+                $variant->whereRaw(ProductVariant::effectivePriceSql().' >= cast(? as decimal(12,2))', [$min]);
             });
         }
 
         if (isset($filters['max']) && $filters['max'] !== null && $filters['max'] !== '') {
             $max = $filters['max'];
             $query->whereHas('defaultVariant', function (Builder $variant) use ($max): void {
-                $variant->where('unit_price', '<=', $max);
+                $variant->whereRaw(ProductVariant::effectivePriceSql().' <= cast(? as decimal(12,2))', [$max]);
             });
         }
 
         if (($filters['in_stock'] ?? null) === true || ($filters['in_stock'] ?? null) === 1 || ($filters['in_stock'] ?? null) === '1') {
             $query->whereHas('variants', function (Builder $variant): void {
-                $variant->where('current_stock', '>', 0);
+                $variant->whereRaw(ProductVariant::effectiveStockSql().' > 0');
             });
         }
 
@@ -147,6 +148,11 @@ class CatalogSearch
             } else {
                 $outer->orWhere('name', 'like', '%'.$like.'%');
             }
+
+            // Admin-renamed products are also found by their effective name.
+            $outer->orWhereHas('catalogOverride', function (Builder $override) use ($like): void {
+                $override->where('name', 'like', '%'.$like.'%');
+            });
         });
     }
 
@@ -184,7 +190,11 @@ class CatalogSearch
         match ($sort) {
             'price_low_to_high' => $query->orderBy('default_unit_price')->orderByDesc('products.id'),
             'price_high_to_low' => $query->orderByDesc('default_unit_price')->orderByDesc('products.id'),
-            default => $query->orderByDesc('products.id'),
+            // Default: admin sort_order first (unset last), then newest.
+            default => $query
+                ->orderByRaw('(select po.sort_order from product_overrides po where po.product_id = products.id) is null')
+                ->orderByRaw('(select po.sort_order from product_overrides po where po.product_id = products.id)')
+                ->orderByDesc('products.id'),
         };
     }
 
@@ -220,7 +230,7 @@ class CatalogSearch
         $prices = ProductVariant::query()
             ->where('is_default', true)
             ->whereIn('product_id', $ids)
-            ->selectRaw('min(unit_price) as min_price, max(unit_price) as max_price')
+            ->selectRaw('min('.ProductVariant::effectivePriceSql().') as min_price, max('.ProductVariant::effectivePriceSql().') as max_price')
             ->first();
 
         return [

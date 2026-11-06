@@ -181,7 +181,7 @@ class WishlistController extends Controller
                     ->withCount('variants')
                     ->withExists([
                         'variants as in_stock' => function ($variant): void {
-                            $variant->where('current_stock', '>', 0);
+                            $variant->whereRaw(\App\Modules\Catalog\Models\ProductVariant::effectiveStockSql().' > 0');
                         },
                     ]);
             },

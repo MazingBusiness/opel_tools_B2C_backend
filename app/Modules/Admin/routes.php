@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\Admin\Http\Controllers\AdminAuthController;
+use App\Modules\Admin\Http\Controllers\AdminCatalogController;
 use App\Modules\Admin\Http\Controllers\AdminOrderController;
 use App\Modules\Admin\Http\Controllers\AdminSeoController;
 use App\Modules\Admin\Http\Controllers\AdminUserController;
@@ -55,4 +56,19 @@ Route::prefix('admin/seo')->middleware(['auth:sanctum', 'admin'])->group(functio
     Route::put('/{type}/{key}', [AdminSeoController::class, 'update'])
         ->whereIn('type', ['page', 'product', 'category_group', 'category'])
         ->where('key', '[A-Za-z0-9_\-]{1,64}');
+});
+
+// Admin Catalog v0: B2B base vs overrides. Saves are version-guarded (409 on conflict).
+Route::prefix('admin/catalog')->middleware(['auth:sanctum', 'admin'])->group(function (): void {
+    Route::get('/{entity}', [AdminCatalogController::class, 'index'])
+        ->whereIn('entity', ['groups', 'categories', 'products']);
+    Route::get('/{entity}/{id}', [AdminCatalogController::class, 'show'])
+        ->whereIn('entity', ['groups', 'categories', 'products', 'variants'])
+        ->whereNumber('id');
+    Route::put('/{entity}/{id}', [AdminCatalogController::class, 'update'])
+        ->whereIn('entity', ['groups', 'categories', 'products', 'variants'])
+        ->whereNumber('id');
+    Route::post('/{entity}/{id}/reset', [AdminCatalogController::class, 'reset'])
+        ->whereIn('entity', ['groups', 'categories', 'products', 'variants'])
+        ->whereNumber('id');
 });

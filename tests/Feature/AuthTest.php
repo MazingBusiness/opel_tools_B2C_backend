@@ -28,6 +28,10 @@ class AuthTest extends TestCase
                 return '123456';
             }
         });
+
+        // Phone OTP goes WhatsApp-first when WhatsApp is enabled (WhatsAppOtpTest covers
+        // that). These tests exercise the SMS path, so pin WhatsApp off regardless of .env.
+        config(['services.whatsapp.otp_enabled' => false]);
     }
 
     public function test_request_otp_email_uses_mail_channel(): void

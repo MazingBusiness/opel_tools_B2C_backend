@@ -192,8 +192,8 @@ class SeoResolver
             // Category must belong to the (active) group named in the URL.
             $id = Category::query()
                 ->where('slug', $segments[2])
-                ->where('is_active', true)
-                ->whereHas('categoryGroup', fn ($q) => $q->where('slug', $segments[1])->where('is_active', true))
+                ->visible()
+                ->whereHas('categoryGroup', fn ($q) => $q->where('slug', $segments[1])->visible())
                 ->value('id');
 
             return $id !== null
@@ -202,15 +202,15 @@ class SeoResolver
         }
 
         if ($first === 'category' && count($segments) === 2) {
-            $groupId = CategoryGroup::query()->where('slug', $segments[1])->where('is_active', true)->value('id');
+            $groupId = CategoryGroup::query()->where('slug', $segments[1])->visible()->value('id');
             if ($groupId !== null) {
                 return ['type' => SeoMeta::TYPE_CATEGORY_GROUP, 'key' => (string) $groupId, 'path' => $path];
             }
             // /category/{categorySlug} also resolves; canonical points to the full path.
             $id = Category::query()
                 ->where('slug', $segments[1])
-                ->where('is_active', true)
-                ->whereHas('categoryGroup', fn ($q) => $q->where('is_active', true))
+                ->visible()
+                ->whereHas('categoryGroup', fn ($q) => $q->visible())
                 ->value('id');
 
             return $id !== null
@@ -843,7 +843,7 @@ class SeoResolver
             return;
         }
 
-        $groups = CategoryGroup::query()->where('is_active', true)->orderBy('id')->get(['id', 'slug', 'updated_at']);
+        $groups = CategoryGroup::query()->visible()->orderBy('id')->get(['id', 'slug', 'updated_at']);
         $groupSlugs = $groups->pluck('slug', 'id');
         foreach ($groups as $group) {
             if ($e = $entry(SeoMeta::TYPE_CATEGORY_GROUP, (string) $group->id, '/category/'.$group->slug, $group->updated_at)) {
@@ -852,7 +852,7 @@ class SeoResolver
         }
 
         $categories = Category::query()
-            ->where('is_active', true)
+            ->visible()
             ->whereIn('category_group_id', $groupSlugs->keys())
             ->orderBy('id')
             ->get(['id', 'slug', 'category_group_id', 'updated_at']);

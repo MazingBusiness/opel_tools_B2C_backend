@@ -93,12 +93,13 @@ class OrderController extends Controller
                     if (! $product || ! $variant || ! $product->published || ! $product->approved) {
                         throw new RuntimeException('Cart contains an unavailable item. Update your cart and try again.');
                     }
-                    $stock = (int) $variant->current_stock;
+                    // Effective stock / price (admin overrides merged), recomputed at placement.
+                    $stock = $variant->effectiveStock();
                     $qty = min((int) $cartItem->qty, max(0, $stock));
                     if ($qty < 1) {
                         throw new RuntimeException('Cart contains an out-of-stock item.');
                     }
-                    $unit = (float) $variant->unit_price;
+                    $unit = $variant->effectiveUnitPrice();
                     $lineTotal = round($unit * $qty, 2);
                     $subtotal += $lineTotal;
                     $itemCount += $qty;
@@ -168,6 +169,9 @@ class OrderController extends Controller
                     ]);
                 }
 
+                // Future B2B handoff (not built): send order_items.unit_price (the price
+                // paid) with RAW B2B identifiers (product/variant ids, part_no, which is
+                // never overridable). See config('catalog.b2b_handoff').
                 foreach ($lines as $line) {
                     $order->items()->create($line);
                 }

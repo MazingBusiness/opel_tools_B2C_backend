@@ -2,6 +2,9 @@
 
 namespace App\Modules\Catalog\Models;
 
+use App\Modules\Catalog\Models\Concerns\HasCatalogOverride;
+use App\Modules\Catalog\Models\Overrides\ProductVariantOverride;
+use App\Modules\Catalog\Support\CatalogPricing;
 use App\Modules\Catalog\Support\PartNumber;
 use Database\Factories\ProductVariantFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -31,6 +34,56 @@ class ProductVariant extends Model
 {
     /** @use HasFactory<ProductVariantFactory> */
     use HasFactory;
+    use HasCatalogOverride;
+
+    /** @var list<string> */
+    protected $with = ['catalogOverride'];
+
+    public static function catalogOverrideModel(): string
+    {
+        return ProductVariantOverride::class;
+    }
+
+    protected function effectiveAttribute(string $key, mixed $b2b): mixed
+    {
+        $override = $this->overrideValue($key);
+
+        return match ($key) {
+            'unit_price' => CatalogPricing::effective($b2b === null ? null : (string) $b2b, $override === null ? null : (string) $override),
+            // Stock override is a cap: it can lower availability, never raise it.
+            'current_stock' => $override === null ? $b2b : min((int) $b2b, (int) $override),
+            default => $override ?? $b2b,
+        };
+    }
+
+    /** Effective unit price used by storefront, cart and checkout. */
+    public function effectiveUnitPrice(): float
+    {
+        return (float) $this->unit_price;
+    }
+
+    /** Effective stock (B2B stock capped by any admin override). */
+    public function effectiveStock(): int
+    {
+        return (int) $this->current_stock;
+    }
+
+    /**
+     * SQL twin of the effective unit price for a product_variants row.
+     * Keep in sync with CatalogPricing (identity logic today).
+     */
+    public static function effectivePriceSql(string $table = 'product_variants'): string
+    {
+        return "coalesce((select pvo.unit_price from product_variant_overrides pvo where pvo.product_variant_id = {$table}.id), {$table}.unit_price)";
+    }
+
+    /** SQL twin of the effective stock: min(B2B stock, override cap). */
+    public static function effectiveStockSql(string $table = 'product_variants'): string
+    {
+        $cap = "(select pvo.current_stock from product_variant_overrides pvo where pvo.product_variant_id = {$table}.id)";
+
+        return "(case when {$cap} is not null and {$cap} < {$table}.current_stock then {$cap} else {$table}.current_stock end)";
+    }
 
     protected static function newFactory(): ProductVariantFactory
     {
@@ -72,7 +125,7 @@ class ProductVariant extends Model
 
     public function inStock(): bool
     {
-        return $this->current_stock > 0;
+        return $this->effectiveStock() > 0;
     }
 
     /**
