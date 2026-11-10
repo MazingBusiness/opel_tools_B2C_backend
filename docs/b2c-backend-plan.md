@@ -158,6 +158,8 @@ Keep rules simple in v1 (earn % + redeem cap). Complex tiers/expiry campaigns = 
 | Payments | Create Zoho payment link. Webhook that **verifies** Zoho payload |
 | Staff | Dashboard counts, B2C orders, product overrides, offers, M-Coin adjustments |
 
+**B2B → B2C shopper registration:** `POST /api/v1/integrations/b2b/users`. No auth header. Body is optional `name` plus at least one of `email` or `phone`. Creates a shopper (201) or returns the existing one (200), filling only blank name, email, or phone. No Sanctum token, no password, and email/phone stay unverified until the shopper signs in with OTP or Google. A disabled account is returned unchanged and is not re-enabled. 409 when the match is staff, or when email and phone belong to two different users.
+
 ---
 
 ## 8. B2C admin (minimal)

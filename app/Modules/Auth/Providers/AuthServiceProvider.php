@@ -46,5 +46,9 @@ class AuthServiceProvider extends ServiceProvider
         RateLimiter::for('google', function (Request $request) {
             return Limit::perMinute(10)->by($request->ip());
         });
+
+        RateLimiter::for('b2b-registration', function (Request $request) {
+            return Limit::perMinute(60)->by('b2b-registration:'.$request->ip());
+        });
     }
 }

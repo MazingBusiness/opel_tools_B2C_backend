@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Auth\Http\Controllers\B2bUserRegistrationController;
 use App\Modules\Auth\Http\Controllers\GoogleAuthController;
 use App\Modules\Auth\Http\Controllers\OtpController;
 use App\Modules\Auth\Http\Controllers\ProfileController;
@@ -17,3 +18,9 @@ Route::prefix('auth')->group(function (): void {
         Route::post('/logout', [ProfileController::class, 'logout']);
     });
 });
+
+Route::prefix('integrations/b2b')
+    ->middleware('throttle:b2b-registration')
+    ->group(function (): void {
+        Route::post('/users', [B2bUserRegistrationController::class, 'store']);
+    });
