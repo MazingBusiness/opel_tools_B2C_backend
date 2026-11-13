@@ -2,6 +2,7 @@
 
 use App\Modules\Admin\Http\Controllers\AdminAuthController;
 use App\Modules\Admin\Http\Controllers\AdminCatalogController;
+use App\Modules\Admin\Http\Controllers\AdminHomeController;
 use App\Modules\Admin\Http\Controllers\AdminOrderController;
 use App\Modules\Admin\Http\Controllers\AdminSeoController;
 use App\Modules\Admin\Http\Controllers\AdminUserController;
@@ -71,4 +72,10 @@ Route::prefix('admin/catalog')->middleware(['auth:sanctum', 'admin'])->group(fun
     Route::post('/{entity}/{id}/reset', [AdminCatalogController::class, 'reset'])
         ->whereIn('entity', ['groups', 'categories', 'products', 'variants'])
         ->whereNumber('id');
+});
+
+// Admin Homepage v0: one layout, whole-layout saves, version-guarded (409 on conflict).
+Route::prefix('admin/home')->middleware(['auth:sanctum', 'admin'])->group(function (): void {
+    Route::get('/', [AdminHomeController::class, 'show']);
+    Route::put('/', [AdminHomeController::class, 'update']);
 });

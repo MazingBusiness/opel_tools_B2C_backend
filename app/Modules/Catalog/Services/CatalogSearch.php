@@ -44,17 +44,7 @@ class CatalogSearch
 
         $perPage = min(50, max(1, (int) ($filters['per_page'] ?? 20)));
 
-        $products = $query
-            ->with([
-                'brand',
-                'category',
-                'categoryGroup',
-                'defaultVariant',
-            ])
-            ->withCount('variants')
-            ->withExists(['variants as in_stock' => function (Builder $variant): void {
-                $variant->whereRaw(ProductVariant::effectiveStockSql().' > 0');
-            }])
+        $products = $this->withListData($query)
             ->paginate($perPage)
             ->withQueryString();
 
@@ -73,6 +63,27 @@ class CatalogSearch
             'facets' => $facets,
             'matched_variant_ids' => $matched,
         ];
+    }
+
+    /**
+     * Eager loads and computed columns ProductListResource needs.
+     *
+     * @param  Builder<Product>  $query
+     * @return Builder<Product>
+     */
+    public function withListData(Builder $query): Builder
+    {
+        return $query
+            ->with([
+                'brand',
+                'category',
+                'categoryGroup',
+                'defaultVariant',
+            ])
+            ->withCount('variants')
+            ->withExists(['variants as in_stock' => function (Builder $variant): void {
+                $variant->whereRaw(ProductVariant::effectiveStockSql().' > 0');
+            }]);
     }
 
     /**
