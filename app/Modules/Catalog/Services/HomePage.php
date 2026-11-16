@@ -11,6 +11,7 @@ use App\Modules\Catalog\Models\Product;
 use App\Modules\Catalog\Models\ProductVariant;
 use App\Modules\Catalog\Support\CatalogCache;
 use App\Modules\Catalog\Support\CatalogSort;
+use App\Modules\Catalog\Support\CategoryImages;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
@@ -171,16 +172,16 @@ class HomePage
             return null;
         }
 
-        $groupHref = '/products?group='.rawurlencode((string) $group->slug);
+        $groupProductsHref = '/products?group='.rawurlencode((string) $group->slug);
 
         return [
             'id' => (string) $section['id'],
             'type' => 'category_band',
             'title' => filled($section['title'] ?? null) ? (string) $section['title'] : (string) $group->name,
             'group' => ['id' => (int) $group->id, 'name' => (string) $group->name, 'slug' => (string) $group->slug],
-            'view_all_href' => $groupHref,
-            'brands' => $this->brands($result['facets']['brands'] ?? [], $groupHref),
-            'featured_categories' => $this->featuredCategories($group, $result['facets']['categories'] ?? [], $groupHref),
+            'view_all_href' => '/category/'.rawurlencode((string) $group->slug),
+            'brands' => $this->brands($result['facets']['brands'] ?? [], $groupProductsHref),
+            'featured_categories' => $this->featuredCategories($group, $result['facets']['categories'] ?? []),
             'products' => ProductListResource::collection($products)->resolve(),
         ];
     }
@@ -250,7 +251,7 @@ class HomePage
                 'id' => (int) $b->id,
                 'name' => (string) $b->name,
                 'slug' => (string) $b->slug,
-                'logo' => $b->logo ?: null,
+                'logo' => CategoryImages::httpsUrl($b->logo),
                 'href' => $groupHref.'&brand='.rawurlencode((string) $b->slug),
             ])
             ->values()
@@ -263,7 +264,7 @@ class HomePage
      * @param  list<array{id: int, count: int}>  $facet
      * @return list<array<string, mixed>>
      */
-    private function featuredCategories(CategoryGroup $group, array $facet, string $groupHref): array
+    private function featuredCategories(CategoryGroup $group, array $facet): array
     {
         $counts = collect($facet)->sortByDesc('count')->pluck('count', 'id');
         if ($counts->isEmpty()) {
@@ -277,34 +278,23 @@ class HomePage
             ->get()
             ->keyBy('id');
 
-        return $counts->keys()
+        $selected = $counts->keys()
             ->map(fn ($id) => $categories->get((int) $id))
             ->filter()
             ->take(self::FEATURED_CATEGORY_LIMIT)
+            ->values();
+
+        $images = CategoryImages::forCategories($selected, $this->search);
+
+        return $selected
             ->map(fn (Category $c): array => [
                 'id' => (int) $c->id,
                 'name' => (string) $c->name,
                 'slug' => (string) $c->slug,
-                'image_url' => $this->categoryImage($c),
-                'href' => $groupHref.'&category='.rawurlencode((string) $c->slug),
+                'image_url' => $images[$c->id] ?? null,
+                'href' => '/category/'.rawurlencode((string) $group->slug).'/'.rawurlencode((string) $c->slug),
             ])
             ->values()
             ->all();
-    }
-
-    private function categoryImage(Category $category): ?string
-    {
-        $banner = $category->banner;
-        if (is_string($banner) && str_starts_with($banner, 'https://')) {
-            return $banner;
-        }
-
-        $thumb = $this->search->baseQuery(['in_stock' => true])
-            ->where('category_id', $category->id)
-            ->whereNotNull('thumbnail_img')
-            ->orderByDesc('products.id')
-            ->value('thumbnail_img');
-
-        return is_string($thumb) && $thumb !== '' ? $thumb : null;
     }
 }

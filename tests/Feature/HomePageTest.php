@@ -82,11 +82,11 @@ class HomePageTest extends TestCase
         $res->assertJsonCount(1, 'data.sections')
             ->assertJsonPath('data.sections.0.type', 'category_band')
             ->assertJsonPath('data.sections.0.title', 'POWER TOOLS')
-            ->assertJsonPath('data.sections.0.view_all_href', '/products?group=power-tools')
+            ->assertJsonPath('data.sections.0.view_all_href', '/category/power-tools')
             ->assertJsonCount(1, 'data.sections.0.products')
             ->assertJsonPath('data.sections.0.products.0.id', $sellable->id)
             ->assertJsonPath('data.sections.0.featured_categories.0.slug', 'angle-grinder')
-            ->assertJsonPath('data.sections.0.featured_categories.0.href', '/products?group=power-tools&category=angle-grinder');
+            ->assertJsonPath('data.sections.0.featured_categories.0.href', '/category/power-tools/angle-grinder');
 
         $this->asAdmin()->getJson('/api/v1/admin/home')->assertOk()
             ->assertJsonPath('is_default', true)
