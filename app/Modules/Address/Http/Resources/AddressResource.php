@@ -2,10 +2,11 @@
 
 namespace App\Modules\Address\Http\Resources;
 
+use App\Modules\Address\Models\Address;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Modules\Address\Models\Address */
+/** @mixin Address */
 class AddressResource extends JsonResource
 {
     /**
@@ -15,6 +16,7 @@ class AddressResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'party_code' => $this->party_code,
             'name' => $this->name,
             'phone' => $this->phone,
             'line1' => $this->line1,

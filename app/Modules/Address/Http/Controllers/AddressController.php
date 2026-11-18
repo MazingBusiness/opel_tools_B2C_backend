@@ -6,11 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Modules\Address\Http\Requests\StoreAddressRequest;
 use App\Modules\Address\Http\Requests\UpdateAddressRequest;
 use App\Modules\Address\Http\Resources\AddressResource;
+use App\Modules\Address\Jobs\SyncAddressToZoho;
 use App\Modules\Address\Models\Address;
+use App\Modules\Auth\Models\User;
+use App\Modules\Auth\Support\PartyCode;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class AddressController extends Controller
 {
@@ -37,6 +41,17 @@ class AddressController extends Controller
         $makeDefault = (bool) ($data['is_default'] ?? false);
 
         $address = DB::transaction(function () use ($userId, $data, $makeDefault) {
+            // The user row lock serialises suffix allocation; suffixes only go up, so a deleted address's code is never reused.
+            $user = User::query()->whereKey($userId)->lockForUpdate()->firstOrFail();
+            $suffix = (int) $user->next_address_suffix;
+            if ($suffix > PartyCode::LAST_SUFFIX) {
+                throw ValidationException::withMessages([
+                    'address' => 'This account has reached the maximum number of addresses.',
+                ]);
+            }
+            $master = $user->party_code ?? PartyCode::master($userId);
+            $user->forceFill(['party_code' => $master, 'next_address_suffix' => $suffix + 1])->save();
+
             $count = Address::query()->where('user_id', $userId)->lockForUpdate()->count();
             $isDefault = $makeDefault || $count === 0;
 
@@ -49,6 +64,7 @@ class AddressController extends Controller
 
             return Address::query()->create([
                 'user_id' => $userId,
+                'party_code' => PartyCode::address($master, $suffix),
                 'name' => $data['name'],
                 'phone' => $data['phone'],
                 'line1' => $data['line1'],
@@ -60,6 +76,8 @@ class AddressController extends Controller
                 'is_default' => $isDefault,
             ]);
         });
+
+        SyncAddressToZoho::dispatch((int) $address->id);
 
         return (new AddressResource($address))
             ->response()

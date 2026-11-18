@@ -2,6 +2,11 @@
 
 namespace App\Modules\Auth\Models;
 
+use App\Modules\Address\Models\Address;
+use App\Modules\Auth\Support\PartyCode;
+use App\Modules\Cart\Models\CartItem;
+use App\Modules\Order\Models\Order;
+use App\Modules\Wishlist\Models\WishlistItem;
 use Database\Factories\UserFactory;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
@@ -19,6 +24,16 @@ class User extends Authenticatable implements CanResetPasswordContract
 {
     /** @use HasFactory<UserFactory> */
     use CanResetPassword, HasApiTokens, HasFactory, Notifiable;
+
+    protected static function booted(): void
+    {
+        // The master party code comes from the id, so concurrent sign-ups can never share one.
+        static::created(function (User $user): void {
+            if ($user->party_code === null) {
+                $user->forceFill(['party_code' => PartyCode::master((int) $user->id)])->saveQuietly();
+            }
+        });
+    }
 
     protected static function newFactory(): UserFactory
     {
@@ -55,21 +70,21 @@ class User extends Authenticatable implements CanResetPasswordContract
 
     public function wishlistItems(): HasMany
     {
-        return $this->hasMany(\App\Modules\Wishlist\Models\WishlistItem::class);
+        return $this->hasMany(WishlistItem::class);
     }
 
     public function cartItems(): HasMany
     {
-        return $this->hasMany(\App\Modules\Cart\Models\CartItem::class);
+        return $this->hasMany(CartItem::class);
     }
 
     public function addresses(): HasMany
     {
-        return $this->hasMany(\App\Modules\Address\Models\Address::class);
+        return $this->hasMany(Address::class);
     }
 
     public function orders(): HasMany
     {
-        return $this->hasMany(\App\Modules\Order\Models\Order::class);
+        return $this->hasMany(Order::class);
     }
 }
