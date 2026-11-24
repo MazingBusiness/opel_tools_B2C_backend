@@ -13,3 +13,7 @@ Schedule::command('catalog:sync-b2b')
     ->weeklyOn(Carbon::SATURDAY, '02:00')
     ->timezone('Asia/Kolkata')
     ->withoutOverlapping(180);
+
+Schedule::command('fulfilment:sweep-b2b-pushes')
+    ->everyFiveMinutes()
+    ->withoutOverlapping(10);

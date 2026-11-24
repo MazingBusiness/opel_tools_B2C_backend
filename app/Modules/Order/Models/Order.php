@@ -3,6 +3,7 @@
 namespace App\Modules\Order\Models;
 
 use App\Modules\Auth\Models\User;
+use App\Modules\Fulfilment\Models\SubOrder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,6 +14,8 @@ class Order extends Model
         'user_id',
         'number',
         'status',
+        'approval_status',
+        'allocation_version',
         'address_id',
         'shipping_name',
         'shipping_phone',
@@ -48,6 +51,7 @@ class Order extends Model
             'payment_link_expires_at' => 'datetime',
             'paid_at' => 'datetime',
             'timeline' => 'array',
+            'allocation_version' => 'integer',
         ];
     }
 
@@ -59,5 +63,10 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function subOrders(): HasMany
+    {
+        return $this->hasMany(SubOrder::class);
     }
 }

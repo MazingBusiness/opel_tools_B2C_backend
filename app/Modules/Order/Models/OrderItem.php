@@ -11,10 +11,14 @@ class OrderItem extends Model
         'order_id',
         'product_id',
         'variant_id',
+        'part_no',
         'title',
         'image_url',
         'unit_price',
+        'gst_rate',
+        'hsn',
         'qty',
+        'qty_cancelled',
         'line_total',
     ];
 
@@ -22,7 +26,10 @@ class OrderItem extends Model
     {
         return [
             'unit_price' => 'decimal:2',
+            'gst_rate' => 'decimal:2',
             'line_total' => 'decimal:2',
+            'qty' => 'integer',
+            'qty_cancelled' => 'integer',
         ];
     }
 

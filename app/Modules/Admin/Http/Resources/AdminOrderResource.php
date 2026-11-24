@@ -21,6 +21,7 @@ class AdminOrderResource extends JsonResource
         return [
             'number' => $this->number,
             'status' => $this->status,
+            'approval_status' => $this->approval_status,
             'payment_method' => $this->payment_method ?: 'zoho',
             'payment_status' => $this->payment_status,
             'currency' => $this->currency,

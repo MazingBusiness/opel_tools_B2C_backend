@@ -44,6 +44,7 @@ class AdminOrderDetailResource extends AdminOrderResource
                 'id' => $item->id,
                 'product_id' => $item->product_id,
                 'variant_id' => $item->variant_id,
+                'part_no' => $item->part_no,
                 'title' => $item->title,
                 'image_url' => $item->image_url,
                 'unit_price' => (float) $item->unit_price,

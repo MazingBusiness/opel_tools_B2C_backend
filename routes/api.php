@@ -18,4 +18,5 @@ Route::prefix('v1')->group(function (): void {
     require app_path('Modules/Order/routes.php');
     require app_path('Modules/Admin/routes.php');
     require app_path('Modules/Seo/routes.php');
+    require app_path('Modules/Fulfilment/routes.php');
 });

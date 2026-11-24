@@ -277,7 +277,7 @@ class AdminOrdersTest extends TestCase
     public function test_fulfilment_forward_only_processing_to_shipped_to_delivered(): void
     {
         $shopper = User::factory()->create();
-        $order = $this->makeOrder($shopper, ['number' => 'OPL-FULFILL1', 'status' => 'processing']);
+        $order = $this->makeOrder($shopper, ['number' => 'OPL-FULFILL1', 'status' => 'processing', 'approval_status' => 'approved']);
 
         $this->asAdmin()->patchJson("/api/v1/admin/orders/{$order->number}/fulfilment", ['status' => 'shipped'])
             ->assertOk()
@@ -296,7 +296,7 @@ class AdminOrdersTest extends TestCase
     public function test_fulfilment_rejects_skips_and_regressions(): void
     {
         $shopper = User::factory()->create();
-        $processing = $this->makeOrder($shopper, ['number' => 'OPL-SKIP0001', 'status' => 'processing']);
+        $processing = $this->makeOrder($shopper, ['number' => 'OPL-SKIP0001', 'status' => 'processing', 'approval_status' => 'approved']);
         $shipped = $this->makeOrder($shopper, ['number' => 'OPL-REGRESS1', 'status' => 'shipped']);
         $delivered = $this->makeOrder($shopper, ['number' => 'OPL-DONE0001', 'status' => 'delivered']);
 

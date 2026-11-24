@@ -5,6 +5,7 @@ namespace App\Modules\Order\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\Address\Models\Address;
 use App\Modules\Cart\Models\CartItem;
+use App\Modules\Fulfilment\Support\TaxSnapshot;
 use App\Modules\Order\Http\Requests\StoreOrderRequest;
 use App\Modules\Order\Http\Resources\OrderResource;
 use App\Modules\Order\Http\Resources\OrderTrackResource;
@@ -22,7 +23,8 @@ class OrderController extends Controller
 {
     private const FREE_SHIPPING_THRESHOLD = 2999.0;
 
-    private const SHIPPING_FEE = 99.0;
+    // Shipping is free until a delivery partner is chosen (decided 2026-11-22).
+    private const SHIPPING_FEE = 0.0;
 
     public function __construct(private ZohoPaymentService $zoho)
     {
@@ -106,9 +108,11 @@ class OrderController extends Controller
                     $lines[] = [
                         'product_id' => $product->id,
                         'variant_id' => $variant->id,
+                        'part_no' => $variant->part_no,
                         'title' => (string) $product->name,
                         'image_url' => $variant->thumbnail_img ?: $product->thumbnail_img,
                         'unit_price' => $unit,
+                        ...TaxSnapshot::forProduct($product->id, $variant->id),
                         'qty' => $qty,
                         'line_total' => $lineTotal,
                     ];

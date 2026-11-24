@@ -9,6 +9,7 @@ use App\Modules\Admin\Http\Requests\UpdateAdminOrderPaymentNotesRequest;
 use App\Modules\Admin\Http\Resources\AdminOrderDetailResource;
 use App\Modules\Admin\Http\Resources\AdminOrderResource;
 use App\Modules\Auth\Models\User;
+use App\Modules\Fulfilment\Services\OrderAllocator;
 use App\Modules\Order\Models\Order;
 use App\Modules\Order\Support\OrderTimeline;
 use Illuminate\Database\Eloquent\Builder;
@@ -107,6 +108,11 @@ class AdminOrderController extends Controller
                 Response::HTTP_UNPROCESSABLE_ENTITY,
                 'Fulfilment can only advance orders that are processing or shipped.',
             );
+        }
+
+        // Until dispatch (challans) is built, shipping must not strand open sub-orders.
+        if ($current === 'processing' && ($reason = OrderAllocator::dispatchBlockedReason($order))) {
+            abort(Response::HTTP_UNPROCESSABLE_ENTITY, $reason);
         }
 
         $allowed = self::FULFILMENT_NEXT[$current];
