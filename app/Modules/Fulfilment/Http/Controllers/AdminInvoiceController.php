@@ -3,6 +3,8 @@
 namespace App\Modules\Fulfilment\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Admin\Support\AdminAccess;
+use App\Modules\Fulfilment\Models\Challan;
 use App\Modules\Fulfilment\Models\Invoice;
 use App\Modules\Fulfilment\Services\InvoiceBuilder;
 use App\Modules\Fulfilment\Support\Branches;
@@ -10,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Symfony\Component\HttpFoundation\Response;
 
 class AdminInvoiceController extends Controller
 {
@@ -22,7 +25,7 @@ class AdminInvoiceController extends Controller
             'q' => ['nullable', 'string', 'max:64'],
             'page' => ['nullable', 'integer', 'min:1'],
         ]);
-        $page = Invoice::query()
+        $page = AdminAccess::scopeBranches(Invoice::query(), $request)
             ->withCount('challans')
             ->when($data['branch'] ?? null, fn (Builder $q, $b) => $q->where('branch', $b))
             ->when($data['q'] ?? null, fn (Builder $q, $s) => $q->where(fn (Builder $w) => $w
@@ -46,8 +49,9 @@ class AdminInvoiceController extends Controller
         ]);
     }
 
-    public function show(int $id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
+        AdminAccess::assertBranch($request, Invoice::query()->whereKey($id)->value('branch'));
         $i = Invoice::query()->with(['items', 'challans:id,number,invoice_id,order_id', 'challans.order:id,number'])->findOrFail($id);
 
         return response()->json(['ok' => true, 'invoice' => array_merge($i->toArray(), [
@@ -66,7 +70,7 @@ class AdminInvoiceController extends Controller
     {
         $invoice = $this->builder->create($this->challanIds($request), $request->user()?->getAuthIdentifier());
 
-        return $this->show($invoice->id)->setStatusCode(201);
+        return $this->show($request, $invoice->id)->setStatusCode(201);
     }
 
     /** @return list<int> */
@@ -77,6 +81,12 @@ class AdminInvoiceController extends Controller
             'challan_ids.*' => ['integer', 'distinct'],
         ]);
 
-        return array_map('intval', $v['challan_ids']);
+        $ids = array_map('intval', $v['challan_ids']);
+        // Any challan outside this admin's branches makes the whole request a 404.
+        $outside = Challan::query()->whereIn('id', $ids)
+            ->whereNotIn('branch', AdminAccess::admin($request)->allowedBranches())->exists();
+        abort_if($outside, Response::HTTP_NOT_FOUND, 'Not found.');
+
+        return $ids;
     }
 }

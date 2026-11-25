@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Modules\Auth\Models\User;
+use App\Modules\Admin\Models\Admin;
 use App\Modules\Catalog\Models\Brand;
 use App\Modules\Catalog\Models\Category;
 use App\Modules\Catalog\Models\CategoryGroup;
@@ -30,7 +30,7 @@ class CategoryPageTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $admin = User::factory()->staff()->create(['email' => 'cat-admin@example.com']);
+        $admin = Admin::factory()->super()->create(['email' => 'cat-admin@example.com']);
         $this->adminToken = $admin->createToken('opel-b2c-admin', ['admin'])->plainTextToken;
 
         $this->power = CategoryGroup::factory()->create(['name' => 'POWER TOOLS', 'slug' => 'power-tools']);

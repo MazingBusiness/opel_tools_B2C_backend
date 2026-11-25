@@ -10,12 +10,11 @@ use App\Modules\Auth\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Laravel\Sanctum\PersonalAccessToken;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Admin Users v0 — shoppers only (is_staff = false).
- * Read-only list/detail plus activate/deactivate. Staff ids always 404.
+ * Admin Users v0 — shoppers (admins live in the admins table).
+ * Read-only list/detail plus activate/deactivate.
  */
 class AdminUserController extends Controller
 {
@@ -105,11 +104,11 @@ class AdminUserController extends Controller
      */
     private function shoppers(): Builder
     {
-        return User::query()->where('is_staff', false);
+        return User::query();
     }
 
     /**
-     * Staff (and unknown) ids are indistinguishable: both 404.
+     * Unknown ids 404.
      */
     private function findShopper(string $id): User
     {
@@ -124,16 +123,9 @@ class AdminUserController extends Controller
         return $user;
     }
 
-    /**
-     * Delete shopper tokens only. Any token carrying the "admin" ability is kept,
-     * regardless of its name, so staff sessions can never be revoked from here.
-     */
     private function revokeShopperTokens(User $user): void
     {
-        $user->tokens()
-            ->get()
-            ->reject(fn (PersonalAccessToken $token): bool => in_array('admin', $token->abilities ?? [], true))
-            ->each(fn (PersonalAccessToken $token) => $token->delete());
+        $user->tokens()->delete();
     }
 
     private function userPayload(User $user): JsonResponse

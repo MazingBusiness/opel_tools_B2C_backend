@@ -1,6 +1,8 @@
 <?php
 
 use App\Modules\Admin\Http\Middleware\EnsureAdmin;
+use App\Modules\Admin\Http\Middleware\EnsureAdminModule;
+use App\Modules\Admin\Http\Middleware\EnsureSuperAdmin;
 use App\Modules\Auth\Http\Middleware\EnsureShopperActive;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -17,6 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'admin' => EnsureAdmin::class,
+            'admin.module' => EnsureAdminModule::class,
+            'admin.super' => EnsureSuperAdmin::class,
             'shopper.active' => EnsureShopperActive::class,
         ]);
     })

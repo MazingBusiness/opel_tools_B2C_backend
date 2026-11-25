@@ -3,6 +3,7 @@
 namespace App\Modules\Fulfilment\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Admin\Support\AdminAccess;
 use App\Modules\Fulfilment\Jobs\PushChallanItemToB2b;
 use App\Modules\Fulfilment\Models\B2bPush;
 use App\Modules\Fulfilment\Models\Challan;
@@ -25,7 +26,7 @@ class AdminChallanController extends Controller
             'page' => ['nullable', 'integer', 'min:1'],
         ]);
 
-        $page = Challan::query()
+        $page = AdminAccess::scopeBranches(Challan::query(), $request)
             ->with(['order:id,number,shipping_name,shipping_city', 'subOrder:id,number', 'invoice:id,number', 'items.b2bPush'])
             ->when($data['branch'] ?? null, fn (Builder $q, $b) => $q->where('branch', $b))
             ->when(($data['invoiced'] ?? null) === 'no', fn (Builder $q) => $q->whereNull('invoice_id'))
@@ -43,8 +44,9 @@ class AdminChallanController extends Controller
         ]);
     }
 
-    public function show(int $id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
+        AdminAccess::assertBranch($request, Challan::query()->whereKey($id)->value('branch'));
         $c = Challan::query()->with(['order', 'subOrder:id,number', 'invoice:id,number', 'items.b2bPush'])->findOrFail($id);
 
         return response()->json(['ok' => true, 'challan' => array_merge($this->summary($c), [
@@ -75,6 +77,7 @@ class AdminChallanController extends Controller
     /** Re-queue a push. A needs_check push may already have deducted stock, so it needs explicit confirmation. */
     public function retryPush(Request $request, int $pushId): JsonResponse
     {
+        $this->authorizePush($request, $pushId);
         $data = $request->validate(['confirmed_not_received' => ['nullable', 'boolean']]);
         $push = DB::transaction(function () use ($pushId, $data) {
             $push = B2bPush::query()->whereKey($pushId)->lockForUpdate()->firstOrFail();
@@ -90,12 +93,13 @@ class AdminChallanController extends Controller
         });
         PushChallanItemToB2b::dispatch($push->id);
 
-        return $this->show($push->challanItem->challan_id);
+        return $this->show($request, $push->challanItem->challan_id);
     }
 
     /** Admin confirmed with B2B that a needs_check line was received. */
     public function resolvePush(Request $request, int $pushId): JsonResponse
     {
+        $this->authorizePush($request, $pushId);
         $data = $request->validate([
             'b2c_order_record_id' => ['nullable', 'string', 'max:64', 'required_without:note'],
             'note' => ['nullable', 'string', 'max:300', 'required_without:b2c_order_record_id'],
@@ -118,7 +122,12 @@ class AdminChallanController extends Controller
             return $push;
         });
 
-        return $this->show($push->challanItem->challan_id);
+        return $this->show($request, $push->challanItem->challan_id);
+    }
+
+    private function authorizePush(Request $request, int $pushId): void
+    {
+        AdminAccess::assertBranch($request, B2bPush::query()->find($pushId)?->challanItem?->challan?->branch);
     }
 
     private function summary(Challan $c): array

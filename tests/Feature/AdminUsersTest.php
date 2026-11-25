@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Modules\Address\Models\Address;
+use App\Modules\Admin\Models\Admin;
 use App\Modules\Auth\Models\User;
 use App\Modules\Order\Models\Order;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -14,7 +15,7 @@ class AdminUsersTest extends TestCase
 {
     use RefreshDatabase;
 
-    private User $admin;
+    private Admin $admin;
 
     private string $adminToken;
 
@@ -22,7 +23,7 @@ class AdminUsersTest extends TestCase
     {
         parent::setUp();
 
-        $this->admin = User::factory()->staff()->create([
+        $this->admin = Admin::factory()->super()->create([
             'name' => 'Ops Admin',
             'email' => 'admin@example.com',
         ]);
@@ -75,11 +76,11 @@ class AdminUsersTest extends TestCase
 
         $this->getJson('/api/v1/admin/users')->assertUnauthorized();
 
-        $this->withToken($shopperToken)->getJson('/api/v1/admin/users')->assertForbidden();
+        $this->withToken($shopperToken)->getJson('/api/v1/admin/users')->assertUnauthorized();
         $this->app['auth']->forgetGuards();
-        $this->withToken($shopperToken)->getJson("/api/v1/admin/users/{$shopper->id}")->assertForbidden();
+        $this->withToken($shopperToken)->getJson("/api/v1/admin/users/{$shopper->id}")->assertUnauthorized();
         $this->app['auth']->forgetGuards();
-        $this->withToken($shopperToken)->postJson("/api/v1/admin/users/{$shopper->id}/deactivate")->assertForbidden();
+        $this->withToken($shopperToken)->postJson("/api/v1/admin/users/{$shopper->id}/deactivate")->assertUnauthorized();
 
         $this->assertNull($shopper->refresh()->disabled_at);
     }
@@ -89,7 +90,7 @@ class AdminUsersTest extends TestCase
     public function test_list_returns_shoppers_only_with_envelope(): void
     {
         $shopper = User::factory()->create(['name' => 'Asha Shopper']);
-        User::factory()->staff()->create(['email' => 'other-staff@example.com']);
+        Admin::factory()->super()->create(['email' => 'other-staff@example.com']);
         $this->makeOrder($shopper);
         $this->makeOrder($shopper);
 
@@ -119,7 +120,7 @@ class AdminUsersTest extends TestCase
         $byName = User::factory()->create(['name' => 'Ravi Kumar', 'email' => 'r1@example.com', 'phone' => '919000000001']);
         $byEmail = User::factory()->create(['name' => 'Someone', 'email' => 'findme@example.com', 'phone' => '919000000002']);
         $byPhone = User::factory()->create(['name' => 'Other', 'email' => 'o@example.com', 'phone' => '919876512345']);
-        User::factory()->staff()->create(['name' => 'Ravi Staff', 'email' => 'ravi-staff@example.com']);
+        Admin::factory()->super()->create(['name' => 'Ravi Staff', 'email' => 'ravi-staff@example.com']);
 
         $this->asAdmin()->getJson('/api/v1/admin/users?q=Ravi')
             ->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $byName->id);
@@ -210,24 +211,6 @@ class AdminUsersTest extends TestCase
             ]);
     }
 
-    public function test_staff_ids_return_404_on_every_route(): void
-    {
-        $staff = User::factory()->staff()->create();
-        $staffToken = $staff->createToken('opel-b2c-admin', ['admin']);
-
-        $this->asAdmin()->getJson("/api/v1/admin/users/{$staff->id}")
-            ->assertNotFound()->assertJsonPath('message', 'User not found.');
-        $this->asAdmin()->postJson("/api/v1/admin/users/{$staff->id}/deactivate")->assertNotFound();
-        $this->asAdmin()->postJson("/api/v1/admin/users/{$staff->id}/activate")->assertNotFound();
-
-        // Acting admin cannot target themselves either.
-        $this->asAdmin()->postJson("/api/v1/admin/users/{$this->admin->id}/deactivate")->assertNotFound();
-
-        $this->assertNull($staff->refresh()->disabled_at);
-        $this->assertNull($this->admin->refresh()->disabled_at);
-        $this->assertNotNull(PersonalAccessToken::find($staffToken->accessToken->id));
-    }
-
     public function test_unknown_and_malformed_ids_return_404(): void
     {
         $this->asAdmin()->getJson('/api/v1/admin/users/999999')->assertNotFound();
@@ -237,15 +220,13 @@ class AdminUsersTest extends TestCase
 
     // ---- deactivate / activate ---------------------------------------------
 
-    public function test_deactivate_sets_disabled_at_and_revokes_only_shopper_tokens(): void
+    public function test_deactivate_sets_disabled_at_and_revokes_that_shoppers_tokens(): void
     {
         $shopper = User::factory()->create();
         $other = User::factory()->create();
 
         $shopperToken1 = $shopper->createToken('opel-b2c');
         $shopperToken2 = $shopper->createToken('opel-b2c');
-        // Defensive: a token with the admin ability must never be deleted here.
-        $adminAbilityToken = $shopper->createToken('opel-b2c-admin', ['admin']);
         $otherToken = $other->createToken('opel-b2c');
 
         $this->asAdmin()->postJson("/api/v1/admin/users/{$shopper->id}/deactivate")
@@ -257,7 +238,6 @@ class AdminUsersTest extends TestCase
         $this->assertNotNull($shopper->refresh()->disabled_at);
         $this->assertNull(PersonalAccessToken::find($shopperToken1->accessToken->id));
         $this->assertNull(PersonalAccessToken::find($shopperToken2->accessToken->id));
-        $this->assertNotNull(PersonalAccessToken::find($adminAbilityToken->accessToken->id));
         $this->assertNotNull(PersonalAccessToken::find($otherToken->accessToken->id));
         $this->assertNull($other->refresh()->disabled_at);
 

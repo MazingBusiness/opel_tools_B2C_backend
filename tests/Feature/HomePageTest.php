@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modules\Admin\Models\Admin;
 use App\Modules\Auth\Models\User;
 use App\Modules\Catalog\Models\Category;
 use App\Modules\Catalog\Models\CategoryGroup;
@@ -26,7 +27,7 @@ class HomePageTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $admin = User::factory()->staff()->create(['email' => 'home-admin@example.com']);
+        $admin = Admin::factory()->super()->create(['email' => 'home-admin@example.com']);
         $this->adminToken = $admin->createToken('opel-b2c-admin', ['admin'])->plainTextToken;
 
         $this->power = CategoryGroup::factory()->create(['name' => 'POWER TOOLS', 'slug' => 'power-tools']);
@@ -182,8 +183,8 @@ class HomePageTest extends TestCase
 
         $shopper = User::factory()->create();
         $token = $shopper->createToken('opel-b2c')->plainTextToken;
-        $this->withToken($token)->getJson('/api/v1/admin/home')->assertForbidden();
+        $this->withToken($token)->getJson('/api/v1/admin/home')->assertUnauthorized();
         $this->app['auth']->forgetGuards();
-        $this->withToken($token)->putJson('/api/v1/admin/home', ['expected_version' => 0, 'sections' => []])->assertForbidden();
+        $this->withToken($token)->putJson('/api/v1/admin/home', ['expected_version' => 0, 'sections' => []])->assertUnauthorized();
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Modules\Fulfilment\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Admin\Support\AdminAccess;
 use App\Modules\Fulfilment\Models\SubOrder;
 use App\Modules\Fulfilment\Services\SubOrderService;
 use App\Modules\Fulfilment\Support\Branches;
@@ -25,7 +26,7 @@ class AdminSubOrderController extends Controller
             'page' => ['nullable', 'integer', 'min:1'],
         ]);
 
-        $page = SubOrder::query()
+        $page = AdminAccess::scopeBranches(SubOrder::query(), $request)
             ->with(['order:id,number,shipping_name,shipping_city,user_id', 'items', 'challans:id,sub_order_id,invoice_id'])
             ->when($data['branch'] ?? null, fn (Builder $q, $b) => $q->where('branch', $b))
             ->when($data['q'] ?? null, fn (Builder $q, $s) => $q->where(fn (Builder $w) => $w
@@ -44,13 +45,16 @@ class AdminSubOrderController extends Controller
         ]);
     }
 
-    public function show(int $id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
+        $this->authorizeBranch($request, $id);
+
         return $this->payload($id);
     }
 
     public function challan(Request $request, int $id): JsonResponse
     {
+        $this->authorizeBranch($request, $id);
         $data = $this->validateLines($request);
         $challan = $this->service->createChallan($id, $data['expected_version'], $data['lines'], $request->user()?->getAuthIdentifier());
 
@@ -59,6 +63,7 @@ class AdminSubOrderController extends Controller
 
     public function cancel(Request $request, int $id): JsonResponse
     {
+        $this->authorizeBranch($request, $id);
         $data = $this->validateLines($request);
         $this->service->cancel($id, $data['expected_version'], $data['lines']);
 
@@ -113,6 +118,11 @@ class AdminSubOrderController extends Controller
             'qty_pending' => $s->items->sum(fn ($i) => $i->pendingQty()),
             'created_at' => $s->created_at?->toIso8601String(),
         ];
+    }
+
+    private function authorizeBranch(Request $request, int $id): void
+    {
+        AdminAccess::assertBranch($request, SubOrder::query()->whereKey($id)->value('branch'));
     }
 
     private function payload(int $id, array $extra = []): JsonResponse

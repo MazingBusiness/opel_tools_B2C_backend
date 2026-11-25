@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modules\Admin\Models\Admin;
 use App\Modules\Auth\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -12,7 +13,7 @@ class AdminAuthTest extends TestCase
 
     public function test_staff_login_returns_admin_token(): void
     {
-        $user = User::factory()->staff()->create([
+        $user = Admin::factory()->super()->create([
             'email' => 'admin@example.com',
             'name' => 'Admin',
         ]);
@@ -26,7 +27,7 @@ class AdminAuthTest extends TestCase
             ->assertJsonPath('ok', true)
             ->assertJsonPath('token_type', 'Bearer')
             ->assertJsonPath('user.email', 'admin@example.com')
-            ->assertJsonPath('user.is_staff', true);
+            ->assertJsonPath('user.is_super', true);
 
         $this->assertNotEmpty($response->json('token'));
         $this->assertDatabaseHas('personal_access_tokens', [
@@ -40,7 +41,6 @@ class AdminAuthTest extends TestCase
         User::factory()->create([
             'email' => 'shopper@example.com',
             'password' => 'password',
-            'is_staff' => false,
         ]);
 
         $this->postJson('/api/v1/admin/auth/login', [
@@ -54,7 +54,7 @@ class AdminAuthTest extends TestCase
 
     public function test_bad_password_gets_generic_401(): void
     {
-        User::factory()->staff()->create([
+        Admin::factory()->super()->create([
             'email' => 'admin@example.com',
         ]);
 
@@ -70,19 +70,18 @@ class AdminAuthTest extends TestCase
     {
         $user = User::factory()->create([
             'email' => 'shopper@example.com',
-            'is_staff' => false,
         ]);
 
         $token = $user->createToken('opel-b2c')->plainTextToken;
 
         $this->withToken($token)
             ->getJson('/api/v1/admin/auth/me')
-            ->assertForbidden();
+            ->assertUnauthorized();
     }
 
     public function test_staff_with_shopper_star_token_on_admin_me_returns_403(): void
     {
-        $user = User::factory()->staff()->create([
+        $user = Admin::factory()->super()->create([
             'email' => 'admin@example.com',
         ]);
 
@@ -96,7 +95,7 @@ class AdminAuthTest extends TestCase
 
     public function test_admin_me_and_logout(): void
     {
-        $user = User::factory()->staff()->create([
+        $user = Admin::factory()->super()->create([
             'email' => 'admin@example.com',
             'name' => 'Admin',
         ]);
@@ -107,7 +106,7 @@ class AdminAuthTest extends TestCase
             ->getJson('/api/v1/admin/auth/me')
             ->assertOk()
             ->assertJsonPath('user.email', 'admin@example.com')
-            ->assertJsonPath('user.is_staff', true);
+            ->assertJsonPath('user.is_super', true);
 
         $this->withToken($token)
             ->postJson('/api/v1/admin/auth/logout')

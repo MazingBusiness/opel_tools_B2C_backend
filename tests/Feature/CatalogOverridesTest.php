@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Modules\Address\Models\Address;
+use App\Modules\Admin\Models\Admin;
 use App\Modules\Auth\Models\User;
 use App\Modules\Catalog\Models\Category;
 use App\Modules\Catalog\Models\CategoryGroup;
@@ -33,7 +34,7 @@ class CatalogOverridesTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $admin = User::factory()->staff()->create(['email' => 'catalog-admin@example.com']);
+        $admin = Admin::factory()->super()->create(['email' => 'catalog-admin@example.com']);
         $this->adminToken = $admin->createToken('opel-b2c-admin', ['admin'])->plainTextToken;
 
         $this->group = CategoryGroup::factory()->create(['name' => 'POWER TOOLS', 'slug' => 'power-tools']);
@@ -384,7 +385,7 @@ class CatalogOverridesTest extends TestCase
         $this->getJson('/api/v1/admin/catalog/products')->assertUnauthorized();
         $shopper = User::factory()->create();
         $this->withToken($shopper->createToken('opel-b2c')->plainTextToken)
-            ->getJson('/api/v1/admin/catalog/products')->assertForbidden();
+            ->getJson('/api/v1/admin/catalog/products')->assertUnauthorized();
 
         $other = Product::factory()->create(['name' => 'Other', 'group_id' => $this->group->id, 'category_id' => $this->category->id]);
         $this->save('variants', (int) $other->defaultVariant->id, ['label' => 'Shown label'])->assertOk();

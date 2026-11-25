@@ -180,12 +180,11 @@ class AdminOrderController extends Controller
     }
 
     /**
-     * Same shopper rule as Admin Users: missing or staff → 404.
+     * Same shopper rule as Admin Users: missing → 404.
      */
     private function assertShopperExists(int $userId): void
     {
         $user = User::query()
-            ->where('is_staff', false)
             ->whereKey($userId)
             ->first();
 

@@ -139,10 +139,6 @@ class AuthService
                 return ['user' => $user, 'created' => true];
             }
 
-            if ($user->is_staff) {
-                throw new ConflictHttpException('That account cannot be registered from B2B.');
-            }
-
             if ($user->isDisabled()) {
                 return ['user' => $user, 'created' => false];
             }

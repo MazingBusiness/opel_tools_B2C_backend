@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modules\Admin\Models\Admin;
 use App\Modules\Auth\Models\User;
 use App\Modules\Order\Models\Order;
 use App\Modules\Order\Models\OrderItem;
@@ -23,7 +24,7 @@ class OrderAllocationTest extends TestCase
     {
         parent::setUp();
         config(['b2b_api.token' => 'test-token', 'b2b_api.base_url' => 'https://b2b.test/api/b2c']);
-        $admin = User::factory()->staff()->create();
+        $admin = Admin::factory()->super()->create();
         $this->token = $admin->createToken('admin', ['admin'])->plainTextToken;
     }
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Admin\Http\Controllers\AdminAccountController;
 use App\Modules\Admin\Http\Controllers\AdminAuthController;
 use App\Modules\Admin\Http\Controllers\AdminCatalogController;
 use App\Modules\Admin\Http\Controllers\AdminHomeController;
@@ -12,12 +13,6 @@ Route::prefix('admin/auth')->group(function (): void {
     Route::post('/login', [AdminAuthController::class, 'login'])
         ->middleware('throttle:admin-login');
 
-    Route::post('/forgot-password', [AdminAuthController::class, 'forgotPassword'])
-        ->middleware('throttle:admin-password-reset');
-
-    Route::post('/reset-password', [AdminAuthController::class, 'resetPassword'])
-        ->middleware('throttle:admin-password-reset');
-
     Route::middleware(['auth:sanctum', 'admin'])->group(function (): void {
         Route::get('/me', [AdminAuthController::class, 'me']);
         Route::patch('/profile', [AdminAuthController::class, 'updateProfile']);
@@ -28,7 +23,7 @@ Route::prefix('admin/auth')->group(function (): void {
 });
 
 // Admin Users v0: shoppers only (staff ids 404).
-Route::prefix('admin/users')->middleware(['auth:sanctum', 'admin'])->group(function (): void {
+Route::prefix('admin/users')->middleware(['auth:sanctum', 'admin', 'admin.module:users'])->group(function (): void {
     Route::get('/', [AdminUserController::class, 'index']);
     Route::get('/{id}', [AdminUserController::class, 'show'])->whereNumber('id');
     Route::post('/{id}/deactivate', [AdminUserController::class, 'deactivate'])->whereNumber('id');
@@ -36,7 +31,7 @@ Route::prefix('admin/users')->middleware(['auth:sanctum', 'admin'])->group(funct
 });
 
 // Admin Orders v0: lookup by order number. User-scoped list via ?user_id= only.
-Route::prefix('admin/orders')->middleware(['auth:sanctum', 'admin'])->group(function (): void {
+Route::prefix('admin/orders')->middleware(['auth:sanctum', 'admin', 'admin.module:orders'])->group(function (): void {
     Route::get('/', [AdminOrderController::class, 'index']);
     Route::get('/{number}', [AdminOrderController::class, 'show'])
         ->where('number', 'OPL-[A-Za-z0-9\-]+');
@@ -49,7 +44,7 @@ Route::prefix('admin/orders')->middleware(['auth:sanctum', 'admin'])->group(func
 });
 
 // Admin SEO v0: targets = page | product | category_group | category.
-Route::prefix('admin/seo')->middleware(['auth:sanctum', 'admin'])->group(function (): void {
+Route::prefix('admin/seo')->middleware(['auth:sanctum', 'admin', 'admin.module:seo'])->group(function (): void {
     Route::get('/targets', [AdminSeoController::class, 'targets']);
     Route::get('/{type}/{key}', [AdminSeoController::class, 'show'])
         ->whereIn('type', ['page', 'product', 'category_group', 'category'])
@@ -60,7 +55,7 @@ Route::prefix('admin/seo')->middleware(['auth:sanctum', 'admin'])->group(functio
 });
 
 // Admin Catalog v0: B2B base vs overrides. Saves are version-guarded (409 on conflict).
-Route::prefix('admin/catalog')->middleware(['auth:sanctum', 'admin'])->group(function (): void {
+Route::prefix('admin/catalog')->middleware(['auth:sanctum', 'admin', 'admin.module:catalog'])->group(function (): void {
     Route::get('/{entity}', [AdminCatalogController::class, 'index'])
         ->whereIn('entity', ['groups', 'categories', 'products']);
     Route::get('/{entity}/{id}', [AdminCatalogController::class, 'show'])
@@ -75,7 +70,18 @@ Route::prefix('admin/catalog')->middleware(['auth:sanctum', 'admin'])->group(fun
 });
 
 // Admin Homepage v0: one layout, whole-layout saves, version-guarded (409 on conflict).
-Route::prefix('admin/home')->middleware(['auth:sanctum', 'admin'])->group(function (): void {
+Route::prefix('admin/home')->middleware(['auth:sanctum', 'admin', 'admin.module:homepage'])->group(function (): void {
     Route::get('/', [AdminHomeController::class, 'show']);
     Route::put('/', [AdminHomeController::class, 'update']);
+});
+
+// Sub-admin management: super admin only.
+Route::prefix('admin/admins')->middleware(['auth:sanctum', 'admin', 'admin.super'])->group(function (): void {
+    Route::get('/', [AdminAccountController::class, 'index']);
+    Route::post('/', [AdminAccountController::class, 'store']);
+    Route::get('/{id}', [AdminAccountController::class, 'show'])->whereNumber('id');
+    Route::put('/{id}', [AdminAccountController::class, 'update'])->whereNumber('id');
+    Route::post('/{id}/reset-password', [AdminAccountController::class, 'resetPassword'])->whereNumber('id');
+    Route::post('/{id}/deactivate', [AdminAccountController::class, 'deactivate'])->whereNumber('id');
+    Route::post('/{id}/activate', [AdminAccountController::class, 'activate'])->whereNumber('id');
 });

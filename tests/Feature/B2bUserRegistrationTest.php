@@ -38,7 +38,6 @@ class B2bUserRegistrationTest extends TestCase
         $user = User::query()->findOrFail($response->json('user.id'));
 
         $this->assertNull($user->password);
-        $this->assertFalse($user->is_staff);
         $this->assertNull($user->email_verified_at);
         $this->assertNull($user->phone_verified_at);
         $this->assertSame(0, $user->tokens()->count());
@@ -127,29 +126,6 @@ class B2bUserRegistrationTest extends TestCase
         $this->assertSame(2, User::query()->count());
         $this->assertSame('919111111111', User::query()->where('email', 'asha@example.com')->value('phone'));
         $this->assertSame('Ravi', User::query()->where('email', 'ravi@example.com')->value('name'));
-    }
-
-    public function test_rejects_staff_account(): void
-    {
-        $staff = User::factory()->staff()->create([
-            'name' => 'Admin',
-            'email' => 'staff@example.com',
-            'phone' => null,
-        ]);
-
-        $this->postRegistration([
-            'name' => 'Shopper',
-            'email' => 'staff@example.com',
-            'phone' => '9876543210',
-        ])->assertStatus(409)
-            ->assertJsonPath('message', 'That account cannot be registered from B2B.');
-
-        $staff->refresh();
-
-        $this->assertSame('Admin', $staff->name);
-        $this->assertNull($staff->phone);
-        $this->assertTrue($staff->is_staff);
-        $this->assertSame(1, User::query()->count());
     }
 
     public function test_returns_disabled_shopper_unchanged(): void

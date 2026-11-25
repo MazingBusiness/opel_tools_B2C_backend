@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modules\Admin\Models\Admin;
 use App\Modules\Auth\Models\User;
 use App\Modules\Fulfilment\Jobs\PushChallanItemToB2b;
 use App\Modules\Fulfilment\Models\B2bPush;
@@ -33,7 +34,7 @@ class FulfilmentFlowTest extends TestCase
         parent::setUp();
         Queue::fake();
         config(['b2b_api.token' => 'test-token', 'b2b_api.base_url' => 'https://b2b.test/api/b2c']);
-        $this->token = User::factory()->staff()->create()->createToken('admin', ['admin'])->plainTextToken;
+        $this->token = Admin::factory()->super()->create()->createToken('admin', ['admin'])->plainTextToken;
         $this->shopper = User::factory()->create();
         Http::fake(['*/closing-stock/*' => Http::response(['success' => false], 500)]);
     }
@@ -461,5 +462,66 @@ class FulfilmentFlowTest extends TestCase
         $this->api()->getJson('/api/v1/admin/sub-orders?branch=KOLKATA')->assertJsonCount(0, 'data');
         $this->api()->getJson('/api/v1/admin/challans?invoiced=yes')->assertJsonCount(1, 'data');
         $this->api()->getJson('/api/v1/admin/invoices')->assertJsonCount(1, 'data');
+    }
+
+    // ---- sub-admin branch scoping -------------------------------------------
+
+    public function test_branch_limited_admin_sees_only_their_branch_and_gets_404_elsewhere(): void
+    {
+        $order = $this->order([['MZ1', 2, 100]]);
+        $this->approve($order, ['MZ1' => ['KOLKATA' => 1, 'MUMBAI' => 1]]);
+        $kol = $this->sub($order, 'KOLKATA');
+        $mum = $this->sub($order, 'MUMBAI');
+        $this->challan($kol)->assertOk();
+        $this->challan($mum)->assertOk();
+        $mumChallan = Challan::query()->where('branch', 'MUMBAI')->firstOrFail();
+        $kolChallan = Challan::query()->where('branch', 'KOLKATA')->firstOrFail();
+        $mumPush = B2bPush::query()->whereHas('challanItem.challan', fn ($q) => $q->where('branch', 'MUMBAI'))->firstOrFail();
+
+        $limited = Admin::factory()->limited(['fulfilment', 'orders'], ['KOLKATA'])->create()
+            ->createToken(Admin::TOKEN_NAME, ['admin'])->plainTextToken;
+        $as = function () use ($limited) {
+            $this->app['auth']->forgetGuards();
+
+            return $this->withToken($limited);
+        };
+
+        $as()->getJson('/api/v1/admin/sub-orders?include_invoiced=1')->assertOk()
+            ->assertJsonCount(1, 'data')->assertJsonPath('data.0.branch', 'KOLKATA');
+        $as()->getJson('/api/v1/admin/challans')->assertOk()->assertJsonCount(1, 'data');
+
+        $as()->getJson("/api/v1/admin/sub-orders/{$kol->id}")->assertOk();
+        $as()->getJson("/api/v1/admin/sub-orders/{$mum->id}")->assertNotFound();
+        $as()->postJson("/api/v1/admin/sub-orders/{$mum->id}/challans", ['expected_version' => $mum->fresh()->version, 'lines' => []])->assertNotFound();
+        $as()->postJson("/api/v1/admin/sub-orders/{$mum->id}/cancel", ['expected_version' => $mum->fresh()->version])->assertNotFound();
+        $as()->getJson("/api/v1/admin/challans/{$kolChallan->id}")->assertOk();
+        $as()->getJson("/api/v1/admin/challans/{$mumChallan->id}")->assertNotFound();
+        $as()->postJson("/api/v1/admin/b2b-pushes/{$mumPush->id}/retry")->assertNotFound();
+        $as()->postJson("/api/v1/admin/b2b-pushes/{$mumPush->id}/resolve", ['b2c_order_record_id' => '1'])->assertNotFound();
+        $as()->postJson('/api/v1/admin/invoices/preview', ['challan_ids' => [$mumChallan->id]])->assertNotFound();
+        $as()->postJson('/api/v1/admin/invoices', ['challan_ids' => [$mumChallan->id]])->assertNotFound();
+        $this->assertDatabaseCount('invoices', 0);
+
+        // Mumbai invoice made by the super admin is invisible to the Kolkata admin.
+        $inv = $this->api()->postJson('/api/v1/admin/invoices', ['challan_ids' => [$mumChallan->id]])->assertCreated()->json('invoice.id');
+        $as()->getJson('/api/v1/admin/invoices')->assertOk()->assertJsonCount(0, 'data');
+        $as()->getJson("/api/v1/admin/invoices/{$inv}")->assertNotFound();
+
+        // Allocation covers the whole order, so the orders module is enough.
+        $as()->getJson("/api/v1/admin/orders/{$order->number}/allocation")->assertOk();
+    }
+
+    public function test_fulfilment_and_allocation_need_their_modules(): void
+    {
+        $order = $this->order([['MZ1', 1, 100]]);
+        $token = Admin::factory()->limited(['users'], ['KOLKATA', 'DELHI', 'MUMBAI'])->create()
+            ->createToken(Admin::TOKEN_NAME, ['admin'])->plainTextToken;
+        $this->app['auth']->forgetGuards();
+
+        $this->withToken($token)->getJson('/api/v1/admin/sub-orders')->assertForbidden();
+        $this->app['auth']->forgetGuards();
+        $this->withToken($token)->getJson('/api/v1/admin/invoices')->assertForbidden();
+        $this->app['auth']->forgetGuards();
+        $this->withToken($token)->getJson("/api/v1/admin/orders/{$order->number}/allocation")->assertForbidden();
     }
 }

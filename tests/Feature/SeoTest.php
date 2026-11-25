@@ -2,12 +2,17 @@
 
 namespace Tests\Feature;
 
+use App\Modules\Admin\Models\Admin;
 use App\Modules\Auth\Models\User;
 use App\Modules\Catalog\Models\Category;
 use App\Modules\Catalog\Models\CategoryGroup;
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Seo\Models\SeoMeta;
+use App\Modules\Seo\Services\SeoResolver;
+use App\Modules\Seo\Support\SeoCache;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 class SeoTest extends TestCase
@@ -23,7 +28,7 @@ class SeoTest extends TestCase
         parent::setUp();
         config(['seo.storefront_url' => self::SHOP, 'seo.cache_ttl' => 300]);
 
-        $admin = User::factory()->staff()->create(['email' => 'seo-admin@example.com']);
+        $admin = Admin::factory()->super()->create(['email' => 'seo-admin@example.com']);
         $this->adminToken = $admin->createToken('opel-b2c-admin', ['admin'])->plainTextToken;
     }
 
@@ -34,7 +39,7 @@ class SeoTest extends TestCase
         return $this->withToken($this->adminToken);
     }
 
-    private function seo(string $path): \Illuminate\Testing\TestResponse
+    private function seo(string $path): TestResponse
     {
         $this->app['auth']->forgetGuards();
 
@@ -67,7 +72,7 @@ class SeoTest extends TestCase
      *
      * @param  array<string, mixed>  $body
      */
-    private function saveSeo(string $url, array $body): \Illuminate\Testing\TestResponse
+    private function saveSeo(string $url, array $body): TestResponse
     {
         if (! array_key_exists('expected_version', $body)
             && preg_match('#/admin/seo/([a-z_]+)/([^/?]+)#', $url, $m) === 1) {
@@ -244,7 +249,7 @@ class SeoTest extends TestCase
 
         // Even a raw DB write is re-sanitized on the public endpoint.
         SeoMeta::query()->where('target_key', (string) $product->id)->update(['content' => '<p>ok</p><script>bad()</script>']);
-        \Illuminate\Support\Facades\Cache::flush();
+        Cache::flush();
         $this->seo('/products/'.$product->id)->assertJsonPath('content', '<p>ok</p>');
     }
 
@@ -352,7 +357,7 @@ class SeoTest extends TestCase
             ['put', "/api/v1/admin/seo/product/{$product->id}"],
         ] as [$method, $url]) {
             $this->app['auth']->forgetGuards();
-            $this->withToken($shopperToken)->json($method, $url, $this->validBody())->assertForbidden();
+            $this->withToken($shopperToken)->json($method, $url, $this->validBody())->assertUnauthorized();
         }
 
         $this->assertSame(0, SeoMeta::query()->count());
@@ -505,13 +510,13 @@ class SeoTest extends TestCase
         // Legacy rows: scheme/port/userinfo mismatches also fall back to self.
         foreach (['http://shop.example.com/x', 'https://shop.example.com:8443/x', 'https://u:p@shop.example.com/x'] as $legacy) {
             SeoMeta::query()->where('target_key', (string) $product->id)->update(['canonical_url' => $legacy]);
-            \Illuminate\Support\Facades\Cache::flush();
+            Cache::flush();
             $this->seo('/products/'.$product->id)->assertJsonPath('canonical_url', self::SHOP.'/products/'.$product->id);
         }
 
         // Legacy row with a foreign canonical: public payload + sitemap fall back to self.
         SeoMeta::query()->where('target_key', (string) $product->id)->update(['canonical_url' => 'https://evil.example.net/x']);
-        \Illuminate\Support\Facades\Cache::flush();
+        Cache::flush();
         $res = $this->seo('/products/'.$product->id)->assertOk()
             ->assertJsonPath('canonical_url', self::SHOP.'/products/'.$product->id)
             ->assertJsonPath('og.url', self::SHOP.'/products/'.$product->id);
@@ -522,7 +527,7 @@ class SeoTest extends TestCase
     public function test_cache_is_keyed_by_resolved_target_not_raw_path(): void
     {
         $product = $this->product();
-        \Illuminate\Support\Facades\Cache::flush();
+        Cache::flush();
 
         foreach (['/about', '/ABOUT', '/about/', '//about?x=1'] as $p) {
             $this->seo($p)->assertOk()->assertJsonPath('type', 'page');
@@ -539,7 +544,7 @@ class SeoTest extends TestCase
 
         $keys = $this->seoCacheKeys();
         sort($keys);
-        $v = \App\Modules\Seo\Support\SeoCache::version();
+        $v = SeoCache::version();
         $this->assertSame([
             "seo:payload:v{$v}:page:about",
             "seo:payload:v{$v}:private:private",
@@ -604,8 +609,8 @@ class SeoTest extends TestCase
         unset($cursor);
         $this->saveSeo($url, $this->validBody(['schema_jsonld' => json_encode($deep)]))
             ->assertUnprocessable()->assertJsonValidationErrors('schema_jsonld');
-        $this->assertTrue(\App\Modules\Seo\Services\SeoResolver::containsType($deep, 'FAQPage'));
-        $this->assertFalse(\App\Modules\Seo\Services\SeoResolver::containsType(['@type' => 'WebPage', 'a' => ['@type' => 'Thing']], 'FAQPage'));
+        $this->assertTrue(SeoResolver::containsType($deep, 'FAQPage'));
+        $this->assertFalse(SeoResolver::containsType(['@type' => 'WebPage', 'a' => ['@type' => 'Thing']], 'FAQPage'));
 
         // Legacy row containing FAQPage: dropped on output, other blocks kept.
         SeoMeta::query()->create([
@@ -740,7 +745,7 @@ class SeoTest extends TestCase
         $product = $this->product();
         $url = "/api/v1/admin/seo/product/{$product->id}";
         $path = '/products/'.$product->id;
-        $cache = \App\Modules\Seo\Support\SeoCache::class;
+        $cache = SeoCache::class;
 
         // Prime the cache with defaults.
         $this->seo($path)->assertOk()->assertJsonPath('h1_is_override', false)
@@ -772,12 +777,12 @@ class SeoTest extends TestCase
     /** @return list<string> */
     private function seoCacheKeys(): array
     {
-        $store = \Illuminate\Support\Facades\Cache::store()->getStore();
+        $store = Cache::store()->getStore();
         $prop = new \ReflectionProperty($store, 'storage');
 
         return array_values(array_filter(
             array_keys($prop->getValue($store)),
-            fn (string $k): bool => str_starts_with($k, \App\Modules\Seo\Support\SeoCache::PREFIX),
+            fn (string $k): bool => str_starts_with($k, SeoCache::PREFIX),
         ));
     }
 }

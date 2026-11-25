@@ -2,12 +2,15 @@
 
 namespace App\Modules\Admin\Providers;
 
-use Illuminate\Auth\Notifications\ResetPassword;
+use App\Modules\Admin\Console\ResetSuperAdminPasswordCommand;
+use App\Modules\Admin\Models\Admin;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Sanctum\PersonalAccessToken;
+use Laravel\Sanctum\Sanctum;
 
 class AdminServiceProvider extends ServiceProvider
 {
@@ -18,6 +21,21 @@ class AdminServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if ($this->app->runningInConsole()) {
+            $this->commands([ResetSuperAdminPasswordCommand::class]);
+        }
+
+        // Admin tokens work only on /admin routes and shopper tokens never do, so
+        // an admin id can never be read as a shopper id (or the reverse).
+        Sanctum::authenticateAccessTokensUsing(function (PersonalAccessToken $token, bool $isValid): bool {
+            if (! $isValid) {
+                return false;
+            }
+            $isAdminToken = $token->tokenable_type === (new Admin)->getMorphClass();
+
+            return $isAdminToken === request()->is('api/v1/admin/*');
+        });
+
         // Admin catalog overrides: "" is a deliberate override (null = reset to B2B),
         // so keep empty strings on these routes.
         ConvertEmptyStringsToNull::skipWhen(fn (Request $request): bool => $request->is('api/v1/admin/catalog/*'));
@@ -25,36 +43,16 @@ class AdminServiceProvider extends ServiceProvider
         RateLimiter::for('admin-login', function (Request $request) {
             $email = strtolower((string) $request->input('email'));
 
-            return Limit::perMinute(5)->by($request->ip().'|'.$email);
-        });
-
-        RateLimiter::for('admin-password-reset', function (Request $request) {
-            $email = strtolower((string) $request->input('email'));
-
-            return Limit::perMinute(5)->by($request->ip().'|'.$email);
+            return [
+                Limit::perMinute(5)->by($request->ip().'|'.$email),
+                Limit::perMinute(20)->by('ip|'.$request->ip()),
+            ];
         });
 
         RateLimiter::for('admin-password-change', function (Request $request) {
             $id = $request->user()?->getAuthIdentifier() ?? $request->ip();
 
             return Limit::perMinute(5)->by((string) $id);
-        });
-
-        ResetPassword::createUrlUsing(function (object $notifiable, string $token): string {
-            $base = rtrim((string) config('app.admin_frontend_url', 'http://localhost:5174'), '/');
-            $email = method_exists($notifiable, 'getEmailForPasswordReset')
-                ? $notifiable->getEmailForPasswordReset()
-                : (string) ($notifiable->email ?? '');
-
-            // Explicit '&' separator: http_build_query() otherwise honours the
-            // arg_separator.output ini (some setups use "&amp;"). The URL must be
-            // raw here; Blade escapes it to &amp; only inside the HTML mail part,
-            // which mail clients decode. Copy links from the text/plain part when
-            // reading MAIL_MAILER=log output.
-            return $base.'/reset-password?'.http_build_query([
-                'token' => $token,
-                'email' => $email,
-            ], '', '&', PHP_QUERY_RFC3986);
         });
     }
 }

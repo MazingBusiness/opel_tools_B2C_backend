@@ -3,23 +3,20 @@
 namespace App\Modules\Admin\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Modules\Admin\Http\Requests\AdminForgotPasswordRequest;
 use App\Modules\Admin\Http\Requests\AdminLoginRequest;
-use App\Modules\Admin\Http\Requests\AdminResetPasswordRequest;
 use App\Modules\Admin\Http\Requests\UpdateAdminPasswordRequest;
 use App\Modules\Admin\Http\Requests\UpdateAdminProfileRequest;
-use App\Modules\Admin\Http\Resources\AdminUserResource;
-use App\Modules\Auth\Models\User;
-use Illuminate\Auth\Events\PasswordReset;
+use App\Modules\Admin\Http\Resources\AdminResource;
+use App\Modules\Admin\Models\Admin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\PersonalAccessToken;
 use Symfony\Component\HttpFoundation\Response;
 
+/** No forgot/reset-password flow: only the super admin resets sub-admins; the super admin recovers via artisan. */
 class AdminAuthController extends Controller
 {
     public function login(AdminLoginRequest $request): JsonResponse
@@ -27,129 +24,76 @@ class AdminAuthController extends Controller
         $email = strtolower(trim((string) $request->validated('email')));
         $password = (string) $request->validated('password');
 
-        /** @var User|null $user */
-        $user = User::query()->where('email', $email)->first();
+        $admin = Admin::query()->where('email', $email)->first();
 
-        if (
-            $user === null
-            || ! filled($user->password)
-            || ! Hash::check($password, $user->password)
-            || ! $user->is_staff
-        ) {
-            return response()->json([
-                'message' => 'Invalid credentials.',
-            ], Response::HTTP_UNAUTHORIZED);
+        // Hash even when the email is unknown, so timing does not reveal which emails are admins.
+        static $dummyHash = null;
+        $dummyHash ??= Hash::make(Str::random(32));
+        $passwordOk = Hash::check($password, $admin instanceof Admin ? $admin->password : $dummyHash);
+
+        if (! $admin instanceof Admin || ! $passwordOk || $admin->isDisabled()) {
+            return response()->json(['message' => 'Invalid credentials.'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $token = $user->createToken('opel-b2c-admin', ['admin'])->plainTextToken;
+        $admin->forceFill(['last_login_at' => now()])->save();
+        $token = $admin->createToken(Admin::TOKEN_NAME, ['admin'])->plainTextToken;
 
         return response()->json([
             'ok' => true,
             'token' => $token,
             'token_type' => 'Bearer',
-            'user' => (new AdminUserResource($user))->resolve(),
+            'user' => (new AdminResource($admin))->resolve(),
         ]);
     }
 
     public function me(Request $request): JsonResponse
     {
-        /** @var User $user */
-        $user = $request->user();
-
         return response()->json([
             'ok' => true,
-            'user' => (new AdminUserResource($user))->resolve(),
+            'user' => (new AdminResource($request->user()))->resolve(),
         ]);
     }
 
     public function updateProfile(UpdateAdminProfileRequest $request): JsonResponse
     {
-        /** @var User $user */
-        $user = $request->user();
-        $user->name = $request->validated('name');
-        $user->save();
+        /** @var Admin $admin */
+        $admin = $request->user();
+        $admin->name = $request->validated('name');
+        $admin->save();
 
         return response()->json([
             'ok' => true,
-            'user' => (new AdminUserResource($user->fresh()))->resolve(),
+            'user' => (new AdminResource($admin->fresh()))->resolve(),
         ]);
     }
 
+    /** Also how a sub-admin replaces a temporary password. Other sessions are logged out. */
     public function updatePassword(UpdateAdminPasswordRequest $request): JsonResponse
     {
-        /** @var User $user */
-        $user = $request->user();
-        $currentToken = $user->currentAccessToken();
+        /** @var Admin $admin */
+        $admin = $request->user();
+        $currentToken = $admin->currentAccessToken();
 
-        $user->password = (string) $request->validated('password');
-        $user->save();
+        $admin->forceFill([
+            'password' => (string) $request->validated('password'),
+            'must_change_password' => false,
+        ])->save();
 
-        $query = $user->tokens()->where('name', 'opel-b2c-admin');
-
+        $query = $admin->tokens();
         if ($currentToken instanceof PersonalAccessToken) {
             $query->where('id', '!=', $currentToken->id);
         }
-
         $query->delete();
-
-        return response()->json(['ok' => true]);
-    }
-
-    public function forgotPassword(AdminForgotPasswordRequest $request): JsonResponse
-    {
-        $email = (string) $request->validated('email');
-
-        /** @var User|null $user */
-        $user = User::query()->where('email', $email)->first();
-
-        if ($user !== null && $user->is_staff) {
-            Password::broker()->sendResetLink(['email' => $email]);
-        }
 
         return response()->json([
             'ok' => true,
-            'message' => 'If that account exists, a reset link has been sent.',
+            'user' => (new AdminResource($admin->fresh()))->resolve(),
         ]);
-    }
-
-    public function resetPassword(AdminResetPasswordRequest $request): JsonResponse
-    {
-        $credentials = $request->only('email', 'password', 'password_confirmation', 'token');
-        $accepted = false;
-
-        $status = Password::broker()->reset(
-            $credentials,
-            function (User $user, string $password) use (&$accepted): void {
-                if (! $user->is_staff) {
-                    return;
-                }
-
-                $user->forceFill([
-                    'password' => $password,
-                    'remember_token' => Str::random(60),
-                ])->save();
-
-                $user->tokens()->delete();
-                $accepted = true;
-
-                event(new PasswordReset($user));
-            }
-        );
-
-        if ($status !== Password::PASSWORD_RESET || ! $accepted) {
-            return response()->json([
-                'message' => 'Unable to reset password.',
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
-        return response()->json(['ok' => true]);
     }
 
     public function logout(Request $request): JsonResponse
     {
-        /** @var User $user */
-        $user = $request->user();
-        $token = $user->currentAccessToken();
+        $token = $request->user()->currentAccessToken();
 
         if ($token instanceof PersonalAccessToken) {
             $token->delete();

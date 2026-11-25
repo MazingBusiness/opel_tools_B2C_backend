@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modules\Admin\Models\Admin;
 use App\Modules\Auth\Models\User;
 use App\Modules\Order\Models\Order;
 use App\Modules\Order\Models\OrderItem;
@@ -14,7 +15,7 @@ class AdminOrdersTest extends TestCase
 {
     use RefreshDatabase;
 
-    private User $admin;
+    private Admin $admin;
 
     private string $adminToken;
 
@@ -22,7 +23,7 @@ class AdminOrdersTest extends TestCase
     {
         parent::setUp();
 
-        $this->admin = User::factory()->staff()->create([
+        $this->admin = Admin::factory()->super()->create([
             'name' => 'Ops Admin',
             'email' => 'admin-orders@example.com',
         ]);
@@ -96,21 +97,21 @@ class AdminOrdersTest extends TestCase
 
         $this->getJson('/api/v1/admin/orders')->assertUnauthorized();
 
-        $this->withToken($shopperToken)->getJson('/api/v1/admin/orders')->assertForbidden();
+        $this->withToken($shopperToken)->getJson('/api/v1/admin/orders')->assertUnauthorized();
         $this->app['auth']->forgetGuards();
-        $this->withToken($shopperToken)->getJson("/api/v1/admin/orders/{$order->number}")->assertForbidden();
+        $this->withToken($shopperToken)->getJson("/api/v1/admin/orders/{$order->number}")->assertUnauthorized();
         $this->app['auth']->forgetGuards();
         $this->withToken($shopperToken)
             ->patchJson("/api/v1/admin/orders/{$order->number}/fulfilment", ['status' => 'shipped'])
-            ->assertForbidden();
+            ->assertUnauthorized();
         $this->app['auth']->forgetGuards();
         $this->withToken($shopperToken)
             ->postJson("/api/v1/admin/orders/{$order->number}/cod-collected")
-            ->assertForbidden();
+            ->assertUnauthorized();
         $this->app['auth']->forgetGuards();
         $this->withToken($shopperToken)
             ->patchJson("/api/v1/admin/orders/{$order->number}/payment-notes", ['payment_notes' => 'x'])
-            ->assertForbidden();
+            ->assertUnauthorized();
     }
 
     // ---- list ------------------------------------------------------------
@@ -199,11 +200,10 @@ class AdminOrdersTest extends TestCase
             ->assertUnprocessable()->assertJsonValidationErrors('payment_status');
     }
 
-    public function test_user_scoped_list_and_404_for_missing_or_staff(): void
+    public function test_user_scoped_list_and_404_for_missing_user(): void
     {
         $shopper = User::factory()->create();
         $other = User::factory()->create();
-        $staff = User::factory()->staff()->create();
         $this->makeOrder($shopper, ['number' => 'OPL-USERSCP1']);
         $this->makeOrder($other, ['number' => 'OPL-OTHERSC1']);
 
@@ -212,10 +212,6 @@ class AdminOrdersTest extends TestCase
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.number', 'OPL-USERSCP1')
             ->assertJsonPath('meta.total', 1);
-
-        $this->asAdmin()->getJson("/api/v1/admin/orders?user_id={$staff->id}")
-            ->assertNotFound()
-            ->assertJsonPath('message', 'User not found.');
 
         $this->asAdmin()->getJson('/api/v1/admin/orders?user_id=999999')
             ->assertNotFound()
