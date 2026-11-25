@@ -31,14 +31,18 @@ return [
     ],
 
     /*
-    | B2B product listing used by catalog:sync-b2b. Set these on the server;
-    | do not put secrets in chat. Pagination always sends page (+ user_id when
-    | set) and never follows next_page_url.
+    | B2B full product list used by catalog:sync-b2b: one GET to
+    | {b2b_api.base_url}/products/all with the B2B_STOCK_TOKEN bearer token.
+    | Products missing from a complete response are unpublished only when the
+    | row count is within unpublish_tolerance of the last complete run.
     */
     'b2b' => [
-        'products_url' => env('B2B_PRODUCTS_URL'),
-        'products_user_id' => env('B2B_PRODUCTS_USER_ID'),
+        'products_path' => '/products/all',
+        'timeout' => (int) env('B2B_PRODUCTS_TIMEOUT', 120),
         'retry' => (int) env('B2B_PRODUCTS_RETRY', 3),
-        'lock_seconds' => (int) env('B2B_PRODUCTS_LOCK_SECONDS', 10800),
+        'lock_seconds' => (int) env('B2B_PRODUCTS_LOCK_SECONDS', 3600),
+        'memory_limit' => env('B2B_PRODUCTS_MEMORY_LIMIT', '512M'),
+        'chunk' => 500,
+        'unpublish_tolerance' => 0.05,
     ],
 ];

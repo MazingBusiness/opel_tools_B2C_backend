@@ -56,15 +56,6 @@ class B2bCatalogSync
     ];
 
     /**
-     * @var array<string, string>
-     */
-    public const WAREHOUSE_CODES = [
-        'Delhi' => 'DELHI',
-        'Mumbai' => 'MUMBAI',
-        'Kolkata' => 'KOLKATA',
-    ];
-
-    /**
      * Brand ids by slug (brands are matched by slug, not fixed ids).
      *
      * @var array<string, int>
@@ -178,6 +169,9 @@ class B2bCatalogSync
         $brandId = $this->brandIdFor($name, $now);
         $photosJson = $photos === [] ? null : json_encode($photos, JSON_UNESCAPED_SLASHES);
         $tags = $this->tagsFor($category, $group);
+        // MRP 0 or below is stored but never sold (no ₹0 checkout or invoice).
+        $sellable = (float) $mrp > 0;
+        $warrantyMonths = self::warrantyMonths($item);
 
         $existing = DB::table('product_variants')->where('part_no', $partNo)->first();
         if ($existing) {
@@ -192,6 +186,8 @@ class B2bCatalogSync
                 'thumbnail_img' => $thumb,
                 'photos' => $photosJson,
                 'tags' => $tags,
+                'published' => $sellable,
+                'warranty_months' => $warrantyMonths,
                 'synced_at' => $now,
                 'updated_at' => $now,
             ]);
@@ -233,11 +229,12 @@ class B2bCatalogSync
             'photos' => $photosJson,
             'description' => $name,
             'tags' => $tags,
-            'published' => true,
+            'published' => $sellable,
             'approved' => true,
             'unit' => 'pc',
             'min_qty' => 1,
             'piece_per_carton' => 1,
+            'warranty_months' => $warrantyMonths,
             'synced_at' => $now,
             'created_at' => $now,
             'updated_at' => $now,
@@ -454,25 +451,78 @@ class B2bCatalogSync
     }
 
     /**
+     * Branch stock keyed by warehouse_code, matched on B2B warehouse_id via
+     * config/branches.php. Warehouses not mapped there (e.g. Chennai) are ignored.
+     *
      * @param  array<string, mixed>  $item
      * @return array<string, int>
      */
     private function stockByCode(array $item): array
     {
+        $codeById = [];
+        foreach ((array) config('branches') as $code => $branch) {
+            $codeById[(int) ($branch['b2b_warehouse_id'] ?? 0)] = (string) $code;
+        }
+
         $qtyByCode = [];
-
-        foreach ($item['stocks'] ?? [] as $stock) {
-            $name = (string) ($stock['warehouse_name'] ?? '');
-            $code = self::WAREHOUSE_CODES[$name] ?? Str::upper($name);
-
-            if ($code === '') {
+        foreach ((array) ($item['stocks'] ?? []) as $stock) {
+            if (! is_array($stock) || ! is_numeric($stock['warehouse_id'] ?? null)) {
+                continue;
+            }
+            $code = $codeById[(int) $stock['warehouse_id']] ?? null;
+            if ($code === null) {
                 continue;
             }
 
-            $qtyByCode[$code] = ($qtyByCode[$code] ?? 0) + (int) ($stock['qty'] ?? 0);
+            $qtyByCode[$code] = ($qtyByCode[$code] ?? 0) + max(0, (int) ($stock['qty'] ?? 0));
         }
 
         return $qtyByCode;
+    }
+
+    /** @param  array<string, mixed>  $item */
+    public static function warrantyMonths(array $item): ?int
+    {
+        $months = $item['warranty_duration'] ?? null;
+        if (empty($item['is_warranty']) || ! is_numeric($months) || (int) $months <= 0) {
+            return null;
+        }
+
+        return min((int) $months, 600);
+    }
+
+    /**
+     * Unpublish synced products none of whose part numbers are in $seen.
+     * Never deletes: orders, carts, overrides and SEO stay attached.
+     *
+     * @param  array<string, true>  $seen  part_no => true
+     * @return list<string> part numbers of the products unpublished
+     */
+    public function unpublishMissing(array $seen, DateTimeInterface $now): array
+    {
+        $partsByProduct = [];
+        $keep = [];
+        DB::table('product_variants')
+            ->join('products', 'products.id', '=', 'product_variants.product_id')
+            ->where('products.published', true)
+            ->select(['product_variants.id', 'product_variants.product_id', 'product_variants.part_no'])
+            ->orderBy('product_variants.id')
+            ->chunk(1000, function ($rows) use ($seen, &$partsByProduct, &$keep): void {
+                foreach ($rows as $row) {
+                    $productId = (int) $row->product_id;
+                    if (isset($seen[$row->part_no])) {
+                        $keep[$productId] = true;
+                    }
+                    $partsByProduct[$productId][] = (string) $row->part_no;
+                }
+            });
+
+        $missing = array_diff_key($partsByProduct, $keep);
+        foreach (array_chunk(array_keys($missing), 500) as $ids) {
+            DB::table('products')->whereIn('id', $ids)->update(['published' => false, 'updated_at' => $now]);
+        }
+
+        return array_merge(...array_values($missing ?: [[]]));
     }
 
     /**

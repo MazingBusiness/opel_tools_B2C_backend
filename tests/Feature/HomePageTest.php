@@ -70,10 +70,10 @@ class HomePageTest extends TestCase
         return array_merge(['id' => 'band-'.$group->id, 'type' => 'category_band', 'group_id' => $group->id], $extra);
     }
 
-    public function test_default_layout_is_one_band_per_visible_group_with_only_sellable_products(): void
+    public function test_default_layout_is_one_band_per_visible_group_with_out_of_stock_last(): void
     {
         $sellable = $this->product('PT-1', $this->grinder);
-        $this->product('PT-OUT', $this->grinder, 0);
+        $out = $this->product('PT-OUT', $this->grinder, 0);
         $this->product('PT-UNPUB', $this->grinder, 5, ['published' => false]);
         $hidden = $this->product('PT-HID', $this->grinder);
         $this->asAdmin()->putJson('/api/v1/admin/catalog/products/'.$hidden->id, ['expected_version' => 0, 'fields' => ['hidden' => true]])->assertOk();
@@ -84,8 +84,10 @@ class HomePageTest extends TestCase
             ->assertJsonPath('data.sections.0.type', 'category_band')
             ->assertJsonPath('data.sections.0.title', 'POWER TOOLS')
             ->assertJsonPath('data.sections.0.view_all_href', '/category/power-tools')
-            ->assertJsonCount(1, 'data.sections.0.products')
+            ->assertJsonCount(2, 'data.sections.0.products')
             ->assertJsonPath('data.sections.0.products.0.id', $sellable->id)
+            ->assertJsonPath('data.sections.0.products.1.id', $out->id)
+            ->assertJsonPath('data.sections.0.products.1.in_stock', false)
             ->assertJsonPath('data.sections.0.featured_categories.0.slug', 'angle-grinder')
             ->assertJsonPath('data.sections.0.featured_categories.0.href', '/category/power-tools/angle-grinder');
 
@@ -99,7 +101,7 @@ class HomePageTest extends TestCase
     {
         $a = $this->product('PIN-A', $this->grinder);
         $b = $this->product('PIN-B', $this->grinder);
-        $this->product('PIN-OUT', $this->grinder, 0);
+        $out = $this->product('PIN-OUT', $this->grinder, 0);
         $newest = $this->product('AUTO-1', $this->grinder);
 
         $this->saveLayout([$this->band($this->power, [
@@ -108,7 +110,8 @@ class HomePageTest extends TestCase
         ])])->assertOk();
 
         $ids = collect($this->getJson('/api/v1/home')->json('data.sections.0.products'))->pluck('id')->all();
-        $this->assertSame([$b->id, $a->id, $newest->id], $ids);
+        // An out-of-stock pin loses its lead spot but still shows, last.
+        $this->assertSame([$b->id, $a->id, $newest->id, $out->id], $ids);
     }
 
     public function test_save_rejects_unsafe_urls_and_links(): void

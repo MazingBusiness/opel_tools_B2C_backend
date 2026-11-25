@@ -103,7 +103,6 @@ class CategoryPage
 
         $result = $this->search->paginate([
             'cat_groups' => [$group->id],
-            'in_stock' => true,
             'per_page' => self::GRID_PRODUCT_LIMIT,
         ]);
 
@@ -176,7 +175,6 @@ class CategoryPage
         $filterCategoryIds = [$category->id, ...$children->pluck('id')->all()];
         $result = $this->search->paginate([
             'categories' => $filterCategoryIds,
-            'in_stock' => true,
             'per_page' => self::GRID_PRODUCT_LIMIT,
         ]);
 
@@ -243,7 +241,7 @@ class CategoryPage
             return [];
         }
 
-        $brandRows = $this->search->baseQuery(['in_stock' => true])
+        $brandRows = $this->search->baseQuery([])
             ->whereIn('products.category_id', $categoryIds)
             ->whereNotNull('products.brand_id')
             ->select('products.category_id', 'products.brand_id', DB::raw('count(*) as aggregate'))
@@ -269,8 +267,10 @@ class CategoryPage
                 ->get()
                 ->keyBy('id');
 
-        $productRows = $this->search->baseQuery(['in_stock' => true])
-            ->whereIn('products.category_id', $categoryIds)
+        $productRows = $this->search->baseQuery([])
+            ->whereIn('products.category_id', $categoryIds);
+        $this->search->orderInStockFirst($productRows);
+        $productRows = $productRows
             ->orderByRaw('(select po.sort_order from product_overrides po where po.product_id = products.id) is null')
             ->orderByRaw('(select po.sort_order from product_overrides po where po.product_id = products.id)')
             ->orderByDesc('products.id')

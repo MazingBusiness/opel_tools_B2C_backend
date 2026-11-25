@@ -42,4 +42,30 @@ class OrderPlacementTest extends TestCase
         $this->assertSame('0.00', (string) $order->shipping_fee);
         $this->assertSame((string) $order->subtotal, (string) $order->grand_total);
     }
+
+    public function test_out_of_stock_product_cannot_be_added_to_cart_or_ordered(): void
+    {
+        $user = User::factory()->create();
+        $address = Address::query()->create([
+            'user_id' => $user->id, 'name' => 'Home', 'phone' => '919876543210', 'line1' => '1 Street',
+            'city' => 'Pune', 'state' => 'Maharashtra', 'pincode' => '411001', 'type' => 'home', 'is_default' => true,
+        ]);
+        $product = Product::factory()->create(['published' => true, 'approved' => true]);
+        $variant = $product->defaultVariant;
+        $variant->update(['unit_price' => 500, 'current_stock' => 0]);
+        $variant->warehouses()->update(['qty' => 0]);
+
+        $this->actingAs($user, 'sanctum')
+            ->postJson('/api/v1/cart/items', ['product_id' => $product->id, 'variant_id' => $variant->id, 'qty' => 1])
+            ->assertUnprocessable()
+            ->assertJsonPath('errors.qty.0', 'This product is out of stock.');
+
+        // A line already in the cart when stock ran out is refused at checkout.
+        CartItem::query()->create(['user_id' => $user->id, 'product_id' => $product->id, 'variant_id' => $variant->id, 'qty' => 1]);
+        $this->actingAs($user, 'sanctum')
+            ->postJson('/api/v1/orders', ['address_id' => $address->id, 'payment_method' => 'cod'])
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'Cart contains an out-of-stock item.');
+        $this->assertSame(0, Order::query()->count());
+    }
 }

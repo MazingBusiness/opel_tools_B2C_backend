@@ -32,6 +32,7 @@ class ProductDetailResource extends JsonResource
             'unit' => $this->unit,
             'min_qty' => $this->min_qty,
             'piece_per_carton' => $this->piece_per_carton,
+            'warranty_months' => $this->warranty_months,
             'has_variants' => $this->variants->count() > 1,
             'in_stock' => $anyInStock,
             'option_groups' => $this->optionGroups(),

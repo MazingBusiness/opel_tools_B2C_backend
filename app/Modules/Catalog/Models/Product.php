@@ -30,13 +30,15 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
     'unit',
     'min_qty',
     'piece_per_carton',
+    'warranty_months',
     'synced_at',
 ])]
 class Product extends Model
 {
+    use HasCatalogOverride;
+
     /** @use HasFactory<ProductFactory> */
     use HasFactory;
-    use HasCatalogOverride;
 
     /** @var list<string> */
     protected $with = ['catalogOverride'];
@@ -88,6 +90,7 @@ class Product extends Model
             'photos' => 'array',
             'published' => 'boolean',
             'approved' => 'boolean',
+            'warranty_months' => 'integer',
             'synced_at' => 'datetime',
         ];
     }

@@ -122,6 +122,21 @@ class CategoryPageTest extends TestCase
         $this->assertContains('bosch', $spotlightBrands);
     }
 
+    public function test_out_of_stock_products_are_listed_last_on_group_and_category_pages(): void
+    {
+        $out = $this->product('OOS-1', $this->grinder, 0);
+        $this->product('IN-1', $this->grinder);
+        $this->product('IN-2', $this->grinder);
+
+        foreach (['/api/v1/category-pages/power-tools', '/api/v1/category-pages/power-tools/angle-grinder'] as $url) {
+            $products = collect($this->getJson($url)->assertOk()->json('data.products'));
+            $this->assertCount(3, $products, $url);
+            $this->assertSame($out->id, $products->last()['id'], $url);
+            $this->assertFalse($products->last()['in_stock'], $url);
+            $this->assertTrue($products->first()['in_stock'], $url);
+        }
+    }
+
     public function test_category_page_validates_https_banner_and_includes_parent_breadcrumbs(): void
     {
         $parent = Category::factory()->create([

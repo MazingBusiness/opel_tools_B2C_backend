@@ -35,10 +35,15 @@ class CatalogSearch
 
         if ($q !== '') {
             $this->orderByRelevance($query, $q);
+            $this->orderInStockFirst($query);
             if (is_string($sort) && $sort !== '') {
                 $this->applySort($query, $sort);
+            } else {
+                // Stable tiebreak so pages never repeat or skip rows.
+                $query->orderByDesc('products.id');
             }
         } else {
+            $this->orderInStockFirst($query);
             $this->applySort($query, is_string($sort) && $sort !== '' ? $sort : 'new_arrival');
         }
 
@@ -190,6 +195,19 @@ class CatalogSearch
                 else 2
             end',
             [$q, $normalized, $prefix],
+        );
+    }
+
+    /**
+     * Out-of-stock products stay listed (so shoppers see the range) but go last.
+     *
+     * @param  Builder<Product>  $query
+     */
+    public function orderInStockFirst(Builder $query): void
+    {
+        $query->orderByRaw(
+            'case when exists (select 1 from product_variants where product_variants.product_id = products.id and '
+            .ProductVariant::effectiveStockSql().' > 0) then 0 else 1 end'
         );
     }
 

@@ -4,5 +4,5 @@ namespace App\Modules\Catalog\Services;
 
 use RuntimeException;
 
-/** B2B returned HTTP success with a body that is not a product page. */
+/** B2B returned a body that is not the product list. */
 final class UnexpectedCatalogPayload extends RuntimeException {}

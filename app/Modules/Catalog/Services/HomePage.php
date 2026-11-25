@@ -158,7 +158,6 @@ class HomePage
 
         $result = $this->search->paginate([
             'cat_groups' => [$group->id],
-            'in_stock' => true,
             'per_page' => min(50, $limit + $pinned->count()),
         ]);
 

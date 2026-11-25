@@ -128,9 +128,13 @@ class CatalogTest extends TestCase
             ->assertJsonPath('data.0.id', $cheap->id)
             ->assertJsonPath('data.2.id', $pricey->id);
 
+        // Out-of-stock products stay listed but always sort last.
         $this->getJson('/api/v1/products?sort=price_high_to_low')
             ->assertOk()
-            ->assertJsonPath('data.0.id', $pricey->id);
+            ->assertJsonPath('data.0.id', $other->id)
+            ->assertJsonPath('data.1.id', $cheap->id)
+            ->assertJsonPath('data.2.id', $pricey->id)
+            ->assertJsonPath('data.2.in_stock', false);
 
         $this->getJson('/api/v1/products?group_id='.$group->id)
             ->assertOk()
