@@ -16,3 +16,9 @@ Schedule::command('catalog:sync-b2b')
 Schedule::command('fulfilment:sweep-b2b-pushes')
     ->everyFiveMinutes()
     ->withoutOverlapping(10);
+
+// cPanel has no long-running worker: drain the database queue (order emails,
+// B2B pushes, Zoho address sync) from the scheduler every minute.
+Schedule::command('queue:work --stop-when-empty --max-time=55')
+    ->everyMinute()
+    ->withoutOverlapping(5);

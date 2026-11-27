@@ -20,6 +20,10 @@ class SmsAlertOtpChannel
         $sender = config('services.smsalert.sender');
 
         if (! filled($apiKey) || ! filled($sender)) {
+            if (! app()->environment(['local', 'testing'])) {
+                throw new RuntimeException('SMS Alert credentials are missing.');
+            }
+
             Log::info('SMS Alert OTP (credentials missing; logged for local use)', [
                 'identifier' => MaskedPhone::mask($identifier->value),
                 'code' => $code,

@@ -57,6 +57,19 @@ class AuthTest extends TestCase
         $this->assertDatabaseCount('users', 0);
     }
 
+    public function test_request_otp_email_returns_503_when_smtp_is_unreachable(): void
+    {
+        config([
+            'mail.default' => 'smtp',
+            'mail.mailers.smtp.scheme' => 'smtp',
+            'mail.mailers.smtp.host' => '127.0.0.1',
+            'mail.mailers.smtp.port' => 1,
+        ]);
+
+        $this->postJson('/api/v1/auth/otp/request', ['identifier' => 'shopper@example.com'])
+            ->assertStatus(503);
+    }
+
     public function test_request_otp_phone_posts_to_smsalert_when_configured(): void
     {
         config([

@@ -3,14 +3,18 @@
 namespace Tests\Feature;
 
 use App\Modules\Auth\Models\OtpChallenge;
+use App\Modules\Auth\Models\User;
+use App\Modules\Auth\Notifications\EmailOtpNotification;
 use App\Modules\Auth\Services\OtpCodeGenerator;
+use App\Modules\Auth\Support\LoginIdentifier;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Testing\TestResponse;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class WhatsAppOtpTest extends TestCase
@@ -49,7 +53,7 @@ class WhatsAppOtpTest extends TestCase
         ]);
     }
 
-    private function request(array $body = []): \Illuminate\Testing\TestResponse
+    private function request(array $body = []): TestResponse
     {
         return $this->postJson('/api/v1/auth/otp/request', $body + ['identifier' => '98765 43210']);
     }
@@ -146,6 +150,79 @@ class WhatsAppOtpTest extends TestCase
         Http::fake([self::GRAPH => Http::response([], 500), self::SMS => Http::response([], 500)]);
 
         $this->request()->assertStatus(503);
+    }
+
+    public function test_sms_disabled_whatsapp_failure_without_verified_email_returns_503(): void
+    {
+        config(['services.smsalert.enabled' => false]);
+        $this->app->detectEnvironment(fn () => 'production');
+        Notification::fake();
+        User::factory()->create([
+            'phone' => LoginIdentifier::parse('9876543210')->value,
+            'email' => 'owner@example.com',
+            'email_verified_at' => null,
+        ]);
+        Http::fake([self::GRAPH => Http::response([], 500), self::SMS => Http::response(['status' => 'success'], 200)]);
+
+        $this->request()->assertStatus(503)
+            ->assertJsonPath('message', 'Unable to send the code right now. Please try again in a few minutes.');
+        $this->assertFalse($this->smsSent());
+        Notification::assertNothingSent();
+    }
+
+    public function test_sms_disabled_whatsapp_failure_falls_back_to_owners_verified_email_with_same_code(): void
+    {
+        config(['services.smsalert.enabled' => false]);
+        $this->app->detectEnvironment(fn () => 'production');
+        Notification::fake();
+        User::factory()->create([
+            'phone' => LoginIdentifier::parse('9876543210')->value,
+            'email' => 'owner@example.com',
+            'email_verified_at' => now(),
+        ]);
+        Http::fake([self::GRAPH => Http::response([], 500)]);
+
+        $this->request()->assertOk()
+            ->assertJsonPath('channel', 'sms')
+            ->assertJsonPath('delivery', 'email')
+            ->assertJsonPath('sent_to', 'o***@example.com');
+
+        Notification::assertSentOnDemand(
+            EmailOtpNotification::class,
+            fn ($n, $channels, $notifiable) => $notifiable->routes['mail'] === 'owner@example.com' && $n->code === '123456',
+        );
+        $this->assertSame(1, OtpChallenge::query()->count());
+        $this->postJson('/api/v1/auth/otp/verify', ['identifier' => '9876543210', 'code' => '123456'])
+            ->assertOk()->assertJsonPath('ok', true);
+    }
+
+    public function test_sms_disabled_ignores_prefer_sms_and_uses_whatsapp(): void
+    {
+        config(['services.smsalert.enabled' => false]);
+        Http::fake($this->waOk());
+
+        $this->request(['prefer' => 'sms'])->assertOk()->assertJsonPath('delivery', 'whatsapp');
+        $this->assertFalse($this->smsSent());
+    }
+
+    public function test_sms_disabled_without_whatsapp_never_logs_the_code_outside_local(): void
+    {
+        config(['services.smsalert.enabled' => false, 'services.whatsapp.otp_enabled' => false]);
+        $this->app->detectEnvironment(fn () => 'production');
+        Http::fake();
+
+        $this->request()->assertStatus(503);
+        $this->assertSame(0, OtpChallenge::query()->whereNotNull('delivered_via')->count());
+    }
+
+    public function test_sms_enabled_without_keys_never_logs_the_code_outside_local(): void
+    {
+        config(['services.smsalert.api_key' => null, 'services.whatsapp.otp_enabled' => false]);
+        $this->app->detectEnvironment(fn () => 'production');
+        Log::spy();
+
+        $this->request()->assertStatus(503);
+        Log::shouldNotHaveReceived('info');
     }
 
     public function test_prefer_sms_skips_whatsapp(): void

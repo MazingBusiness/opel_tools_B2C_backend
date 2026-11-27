@@ -32,7 +32,13 @@ class OtpController extends Controller
         try {
             $challenge = $otp->issue($identifier, $request->validated('prefer'));
         } catch (RuntimeException $exception) {
-            throw new HttpException(503, 'Unable to send OTP right now.', $exception);
+            throw new HttpException(503, 'Unable to send the code right now. Please try again in a few minutes.', $exception);
+        }
+
+        $sentTo = null;
+        if ($identifier->channel === LoginIdentifier::CHANNEL_SMS && $challenge->delivered_via === OtpService::DELIVERY_EMAIL) {
+            $email = $otp->fallbackEmailFor($identifier);
+            $sentTo = $email !== null ? OtpService::maskEmail($email) : null;
         }
 
         return response()->json([
@@ -40,6 +46,8 @@ class OtpController extends Controller
             'channel' => $identifier->channel,
             // email | whatsapp | sms | log. whatsapp = accepted by Meta, not guaranteed delivered.
             'delivery' => $challenge->delivered_via,
+            // Masked address when a phone code fell back to the account's verified email.
+            'sent_to' => $sentTo,
             'expires_in' => (int) config('otp.ttl_seconds'),
             'resend_after' => (int) config('otp.resend_cooldown_seconds', 45),
         ]);
